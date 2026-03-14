@@ -1,0 +1,570 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Planet — 星球任务 (Red Planet 红色星球)
+   Class: .planet
+   Style: 深锈暗色、工业金属质感、火星表面纹理、CRT扫描线
+   Prototype: Direction B "Red Planet" — output/prototype-mars.html
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font — monospace 等宽字体 + Orbitron 展示字体 ── */
+/* Prototype: JetBrains Mono body, Orbitron for display/logo */
+.planet {
+    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'Space Mono', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    letter-spacing: -0.01em;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── 2. Color Variables — 深红锈色工业色板 ── */
+/* Prototype palette (hex):
+   bg: #1a0e0a, canvas: #1e1210, fg: #d4a574, fg-secondary: #a07850,
+   muted: #8a7a6a, sidebar: #140a06, sidebar-fg: #c89870,
+   accent: #c2410c, highlight: #f59e0b, steel: #4a4a52/#6a6a72,
+   card: rgba(30,18,14,0.85), card-header: rgba(40,24,18,0.9),
+   border-panel: rgba(212,165,116,0.15), border: rgba(194,65,12,0.2) */
+.planet {
+    /* 基础色：深锈黑 — prototype #1a0e0a */
+    --background: oklch(0.13 0.03 32);
+    --foreground: oklch(0.76 0.09 65);
+
+    /* 卡片：暗锈色面板 — prototype rgba(30,18,14,0.85)
+       Note: alpha moved to [data-panel] direct rule; variable must be opaque
+       for Tailwind bg-card/50 opacity modifiers to work correctly. */
+    --card: oklch(0.16 0.035 30);
+    --card-foreground: oklch(0.76 0.09 65);
+
+    /* 弹出层：略深于卡片 */
+    --popover: oklch(0.14 0.03 30);
+    --popover-foreground: oklch(0.76 0.09 65);
+
+    /* 主色：锈橙 — prototype #c2410c */
+    --primary: oklch(0.48 0.18 35);
+    --primary-foreground: oklch(0.92 0.02 75);
+
+    /* 次要色：暗红岩色 */
+    --secondary: oklch(0.20 0.04 28);
+    --secondary-foreground: oklch(0.76 0.07 65);
+
+    /* 静默色：尘土棕 — #8a7a6a */
+    --muted: oklch(0.18 0.025 35);
+    --muted-foreground: oklch(0.57 0.03 60);
+
+    /* 强调色：琥珀暖光 — prototype #f59e0b */
+    --accent: oklch(0.75 0.16 80);
+    --accent-foreground: oklch(0.13 0.03 30);
+
+    /* 危险/警告色：深红告警灯 */
+    --destructive: oklch(0.50 0.22 25);
+
+    /* 边框：暖锈线 — prototype rgba(194,65,12,0.2) */
+    --border: oklch(0.48 0.18 35 / 20%);
+
+    /* 输入框：深锈底 */
+    --input: oklch(0.16 0.03 30);
+
+    /* 聚焦环：锈橙 */
+    --ring: oklch(0.48 0.18 35);
+
+    /* 图表色谱：橙/锈/琥珀/砂/钢 */
+    --chart-1: oklch(0.48 0.18 35);   /* 锈橙 #c2410c */
+    --chart-2: oklch(0.40 0.15 30);   /* 深锈红 */
+    --chart-3: oklch(0.75 0.16 80);   /* 琥珀金 #f59e0b */
+    --chart-4: oklch(0.58 0.07 65);   /* 尘沙棕 */
+    --chart-5: oklch(0.40 0.01 250);  /* 钢灰 #4a4a52 */
+
+    /* 侧边栏：近黑暖锈色 — prototype #140a06 */
+    --sidebar: oklch(0.09 0.025 30);
+    --sidebar-foreground: oklch(0.72 0.08 55);
+    --sidebar-primary: oklch(0.48 0.18 35);
+    --sidebar-primary-foreground: oklch(0.92 0.02 75);
+    --sidebar-accent: oklch(0.48 0.18 35 / 15%);
+    --sidebar-accent-foreground: oklch(0.80 0.07 60);
+    --sidebar-border: oklch(0.48 0.18 35 / 15%);
+    --sidebar-ring: oklch(0.48 0.18 35);
+
+    /* Panel radius — tight industrial feel */
+    --radius: 4px;
+}
+
+/* ── 3. Canvas — 火星表面纹理：SVG噪点 + 暖色径向辉光 ── */
+/* Prototype: SVG fractalNoise + radial warm glow + #1e1210 base */
+.planet [data-app-shell] {
+    background:
+        /* 微粒砂尘纹理 — SVG noise matching prototype */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E"),
+        /* 径向暖光辉 — prototype radial-gradient */
+        radial-gradient(
+            ellipse 80% 60% at 50% 40%,
+            rgba(194, 65, 12, 0.06) 0%,
+            transparent 70%
+        ),
+        /* 基底色：深锈黑 — prototype #1e1210 */
+        #1e1210;
+    position: relative;
+}
+
+/* CRT 扫描线叠加层 — 已移除 */
+
+/* ── 4. Panel — 工业舷窗：金属边框、暗透半透卡片 ── */
+/* Prototype: 2px solid rgba(212,165,116,0.15), 4px radius,
+   shadow 0 2px 12px rgba(0,0,0,0.4), inset rgba(212,165,116,0.05) */
+.planet [data-panel] {
+    background: rgba(30, 18, 14, 0.85);
+    border: 2px solid rgba(212, 165, 116, 0.15);
+    border-radius: 4px;
+    box-shadow:
+        0 2px 12px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(212, 165, 116, 0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Panel hover — prototype: border rgba(194,65,12,0.4), glow */
+.planet [data-panel]:hover {
+    border-color: rgba(194, 65, 12, 0.4);
+    box-shadow:
+        0 2px 12px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(194, 65, 12, 0.12);
+}
+
+/* 舷窗内框 — prototype ::after viewport frame */
+.planet [data-panel]::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border: 1px solid rgba(212, 165, 116, 0.06);
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* LED 状态指示灯 — 左上角锈橙脉冲 */
+/* Prototype: .led-corner 5px, accent #c2410c with glow */
+.planet [data-panel]::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #c2410c;
+    box-shadow: 0 0 6px rgba(194, 65, 12, 0.35);
+    z-index: 10;
+    pointer-events: none;
+    animation: planet-led-pulse 3s ease-in-out infinite;
+}
+
+@keyframes planet-led-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* ── 5. Panel Header — 任务控制台标题条 ── */
+/* Prototype: bg rgba(40,24,18,0.9), border-bottom rgba(194,65,12,0.2),
+   padding 10px 14px 10px 24px, 0.72rem, 600, uppercase, 0.06em, color #d4a574 */
+.planet [data-panel-header] {
+    background: rgba(40, 24, 18, 0.9);
+    border-bottom: 1px solid rgba(194, 65, 12, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #d4a574;
+    padding: 10px 14px 10px 24px; /* prototype exact: room for LED dot on left */
+}
+
+/* ── 6. Sidebar — 近黑暖锈色面板 ── */
+/* Prototype: bg #140a06, border-right 1px solid rgba(194,65,12,0.15), fg #c89870 */
+.planet aside[aria-label="Panel navigation"] {
+    background: #140a06;
+    color: #c89870;
+    border-right: 1px solid rgba(194, 65, 12, 0.15);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Sidebar logo — Orbitron accent color */
+/* Prototype: font-family display, 0.95rem, 700, 0.08em, uppercase */
+.planet aside[aria-label="Panel navigation"] > div:first-child > span:first-child {
+    font-family: 'Orbitron Variable', 'Orbitron', 'JetBrains Mono', monospace;
+    color: #c2410c;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* Sidebar section headers */
+.planet aside[aria-label="Panel navigation"] .text-muted-foreground {
+    color: #8a7a6a;
+}
+
+/* Sidebar items hover */
+.planet aside[aria-label="Panel navigation"] [role="button"]:hover,
+.planet aside[aria-label="Panel navigation"] button:hover {
+    background: rgba(194, 65, 12, 0.15);
+}
+
+/* Sidebar item icon color — inherit sidebar fg, not global muted */
+.planet aside[aria-label="Panel navigation"] [role="button"] .text-muted-foreground,
+.planet aside[aria-label="Panel navigation"] button .text-muted-foreground {
+    color: #a08870;
+}
+
+/* Sidebar item hover — brighten text */
+.planet aside[aria-label="Panel navigation"] [role="button"]:hover .text-muted-foreground {
+    color: #c89870;
+}
+
+/* ── 7. CanvasTabs (vertical icon bar) — 暗黑控制台 ── */
+/* Prototype: bg #140a06, border rgba(194,65,12,0.15) */
+.planet [data-app-shell] > .flex.flex-col.items-center {
+    background: #140a06;
+    border-color: rgba(194, 65, 12, 0.15);
+}
+
+/* Active tab indicator — must include `button` for specificity over default rule */
+.planet [data-app-shell] [role="tablist"] button[aria-selected="true"] {
+    background: rgba(194, 65, 12, 0.15);
+    color: #c2410c;
+}
+
+/* Tab default (non-active) — warmer icon color than global muted */
+.planet [data-app-shell] [role="tablist"] button {
+    color: #a08870;
+}
+
+/* Tab hover */
+.planet [data-app-shell] [role="tablist"] button:hover {
+    background: rgba(194, 65, 12, 0.10);
+    color: #d4a574;
+}
+
+/* CanvasTabs non-tab buttons (sidebar toggle, chat, etc.) — warm color */
+.planet [data-app-shell] > .flex.flex-col.items-center button:not([role="tab"]) {
+    color: #a08870;
+}
+.planet [data-app-shell] > .flex.flex-col.items-center button:not([role="tab"]):hover {
+    color: #d4a574;
+}
+
+/* ── 8. Scrollbar — 锈色/琥珀色调 ── */
+.planet ::-webkit-scrollbar-thumb {
+    background: rgba(194, 65, 12, 0.20);
+    border-radius: 1px;
+    border: 1px solid rgba(194, 65, 12, 0.10);
+}
+.planet ::-webkit-scrollbar-thumb:hover {
+    background: rgba(194, 65, 12, 0.40);
+}
+.planet ::-webkit-scrollbar-track {
+    background: #140a06;
+}
+.planet {
+    scrollbar-color: rgba(194, 65, 12, 0.20) #140a06;
+}
+
+/* ── 9. Content-Level Styling ── */
+
+/* 表格 — 数据矩阵样式 */
+/* Prototype: th border 1px, color #8a7a6a, uppercase 0.65rem */
+.planet table {
+    border-color: rgba(194, 65, 12, 0.2);
+    font-size: 0.72rem;
+    color: #d4a574;
+}
+
+.planet th {
+    background: rgba(40, 24, 18, 0.6);
+    border-bottom: 1px solid rgba(194, 65, 12, 0.2);
+    color: #8a7a6a;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+    padding: 6px 8px;
+}
+
+.planet td {
+    border-bottom: 1px solid rgba(212, 165, 116, 0.06);
+    color: #d4a574;
+    padding: 5px 8px;
+}
+
+/* 表格行悬停 — prototype tr:hover td rgba(194,65,12,0.06) */
+.planet tr:hover td {
+    background: rgba(194, 65, 12, 0.06);
+}
+
+/* 表头行背景 */
+.planet thead tr {
+    background: rgba(40, 24, 18, 0.6);
+}
+
+/* KV Panel — 键值对暖色样式 */
+/* Prototype: kv-key #8a7a6a uppercase 0.06em, kv-value #d4a574 semibold */
+.planet [data-panel] .flex.items-baseline.justify-between {
+    border-bottom-color: rgba(212, 165, 116, 0.08);
+    padding: 6px 0;
+}
+
+/* KV key — prototype: 0.68rem, uppercase, 0.06em spacing, muted color */
+.planet [data-panel] .flex.items-baseline.justify-between .text-muted-foreground {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* KV value — prototype: 0.82rem, 600 weight, tabular-nums */
+.planet [data-panel] .flex.items-baseline.justify-between .text-foreground,
+.planet [data-panel] .flex.items-baseline.justify-between .font-medium {
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Numeric values — tabular-nums with warm glow */
+.planet [data-panel] .font-mono.font-semibold {
+    color: #e8a060;
+    text-shadow: 0 0 8px rgba(194, 65, 12, 0.25);
+}
+
+/* 代码块 — 深空终端 */
+/* Prototype: background rgba(0,0,0,0.3), border var(--b-border), radius 2px, padding 10px 12px, line-height 1.7 */
+.planet pre,
+.planet code {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(194, 65, 12, 0.2);
+    border-radius: 2px;
+    color: #d4a574;
+}
+
+.planet pre {
+    padding: 10px 12px;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    overflow-x: auto;
+}
+
+/* Inline code — smaller padding, no block formatting */
+.planet :not(pre) > code {
+    padding: 2px 5px;
+    font-size: 0.85em;
+}
+
+/* Code syntax colors matching prototype */
+.planet code .hljs-comment { color: #8a7a6a; }
+.planet code .hljs-keyword { color: #e87040; font-weight: 500; }
+.planet code .hljs-string { color: #d4a574; }
+.planet code .hljs-number { color: #f59e0b; }
+.planet code .hljs-function { color: #e8a060; }
+
+/* 输入框和文本区域 — 终端输入风格 */
+.planet input,
+.planet textarea,
+.planet select {
+    border: 1px solid rgba(194, 65, 12, 0.2);
+    background: rgba(14, 10, 8, 0.8);
+    color: #d4a574;
+    caret-color: #f59e0b;
+}
+
+.planet input:focus,
+.planet textarea:focus,
+.planet select:focus {
+    border-color: #c2410c;
+    box-shadow: 0 0 8px rgba(194, 65, 12, 0.15);
+    outline: none;
+}
+
+/* 按钮 — 工业控制按键 */
+.planet button {
+    border: 1px solid rgba(194, 65, 12, 0.2);
+    transition: all 0.15s ease;
+}
+
+.planet button:hover {
+    border-color: rgba(194, 65, 12, 0.4);
+    box-shadow: 0 0 6px rgba(194, 65, 12, 0.12);
+}
+
+/* 链接 — 锈橙暖色 */
+.planet a {
+    color: #d4a574;
+    text-decoration-color: rgba(212, 165, 116, 0.3);
+}
+
+.planet a:hover {
+    color: #e8b080;
+    text-decoration-color: rgba(212, 165, 116, 0.6);
+}
+
+/* 选中文本 — 锈橙高亮 */
+.planet ::selection {
+    background: rgba(194, 65, 12, 0.25);
+    color: #f0d0b0;
+}
+
+/* 分割线 — 锈色细线 */
+.planet hr {
+    border-color: rgba(194, 65, 12, 0.2);
+    border-style: solid;
+}
+
+/* 徽章/标签 — 任务状态标识 */
+.planet [data-badge] {
+    border: 1px solid rgba(194, 65, 12, 0.25);
+    text-transform: uppercase;
+    font-size: 0.7em;
+    letter-spacing: 0.05em;
+}
+
+/* ── 10. Checklist / List items ── */
+/* Prototype: checklist-item 0.76rem, color var(--b-fg) */
+.planet [data-panel] input[type="checkbox"] {
+    accent-color: #c2410c;
+    border-color: #6a6a72;
+}
+
+.planet [data-panel] input[type="checkbox"]:checked {
+    background: #c2410c;
+    border-color: #c2410c;
+    box-shadow: 0 0 4px rgba(194, 65, 12, 0.35);
+}
+
+/* ── 11. Timeline Panel — 暖色事件卡片 ── */
+.planet [data-panel] .border-l-2 {
+    border-left-color: rgba(194, 65, 12, 0.4);
+}
+
+/* ── 12. Placeholder & Drag ── */
+/* 占位符 — 锈橙边框 */
+.planet .react-grid-placeholder {
+    background: rgba(194, 65, 12, 0.10) !important;
+    border: 2px solid rgba(194, 65, 12, 0.25) !important;
+    border-radius: 4px;
+}
+
+/* 拖拽状态 — 舷窗脱离 */
+.planet .react-grid-item.react-draggable-dragging [data-panel] {
+    border-color: rgba(194, 65, 12, 0.50) !important;
+    box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.50),
+        0 0 20px rgba(194, 65, 12, 0.15) !important;
+}
+
+/* ── 13. Tooltips & Popovers ── */
+.planet [role="tooltip"],
+.planet [data-radix-popper-content-wrapper] [class*="popover"],
+.planet [data-radix-popper-content-wrapper] > div {
+    background: #1a0e0a;
+    border: 1px solid rgba(212, 165, 116, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: #d4a574;
+}
+
+/* ── 14. Markdown / Prose — 确保暖色调文本 ── */
+/* Override prose defaults for planet theme */
+.planet .prose {
+    --tw-prose-body: #d4a574;
+    --tw-prose-headings: #e8b080;
+    --tw-prose-lead: #a07850;
+    --tw-prose-links: #e87040;
+    --tw-prose-bold: #e8b080;
+    --tw-prose-counters: #8a7a6a;
+    --tw-prose-bullets: #8a7a6a;
+    --tw-prose-hr: rgba(194, 65, 12, 0.2);
+    --tw-prose-quotes: #a07850;
+    --tw-prose-quote-borders: rgba(194, 65, 12, 0.3);
+    --tw-prose-captions: #8a7a6a;
+    --tw-prose-code: #d4a574;
+    --tw-prose-pre-code: #d4a574;
+    --tw-prose-pre-bg: rgba(0, 0, 0, 0.3);
+    --tw-prose-th-borders: rgba(194, 65, 12, 0.2);
+    --tw-prose-td-borders: rgba(212, 165, 116, 0.06);
+}
+
+/* ── 15. Content text — !important hex 确保 WebKit 可读 ── */
+.planet [data-panel] h1,
+.planet [data-panel] h2,
+.planet [data-panel] h3,
+.planet [data-panel] h4,
+.planet [data-panel] h5,
+.planet [data-panel] h6 {
+    color: #e8b080 !important;
+}
+.planet [data-panel] p {
+    color: #d4a574 !important;
+}
+.planet [data-panel] li {
+    color: #d4a574 !important;
+}
+.planet [data-panel] strong,
+.planet [data-panel] b {
+    color: #e8b080 !important;
+}
+.planet [data-panel] a {
+    color: #e87040 !important;
+}
+.planet [data-panel] blockquote {
+    color: #c89870 !important;
+    border-left-color: rgba(194, 65, 12, 0.3) !important;
+}
+.planet [data-panel] :not(pre) > code {
+    color: #e87040 !important;
+    background: rgba(194, 65, 12, 0.1) !important;
+}
+.planet [data-panel] pre code {
+    color: #d4a574 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Gradient overlays inside panels — match dark card bg */
+.planet [data-panel] .bg-gradient-to-t {
+    --tw-gradient-from: rgba(30, 18, 14, 0.95);
+}
+.planet [data-panel] .absolute.bottom-0.pointer-events-none {
+    background: linear-gradient(to top, rgba(30, 18, 14, 0.95), transparent) !important;
+}
+
+/* Status dots — keep their original colors but add glow in planet theme */
+.planet .bg-green-500 { box-shadow: 0 0 4px rgba(34, 197, 94, 0.5); }
+.planet .bg-yellow-500 { box-shadow: 0 0 4px rgba(234, 179, 8, 0.5); }
+.planet .bg-red-500 { box-shadow: 0 0 4px rgba(239, 68, 68, 0.5); }
+.planet .bg-blue-500 { box-shadow: 0 0 4px rgba(59, 130, 246, 0.5); }
+
+/* ── 16. Chart panel — Gauge style ring border ── */
+.planet [data-panel] svg text {
+    fill: #d4a574;
+}
+
+.planet [data-panel] .recharts-cartesian-axis-tick-value {
+    fill: #8a7a6a;
+}
+
+.planet [data-panel] .recharts-cartesian-grid line {
+    stroke: rgba(194, 65, 12, 0.1);
+}
+
+/* ── 17. Panel content area general text ── */
+/* Prototype: panel-body font-size 0.78rem, color var(--b-fg) */
+.planet [data-panel] {
+    color: #d4a574;
+    font-size: 0.78rem;
+}
+
+/* Explicit Tailwind class overrides to ensure warm color rendering */
+.planet .text-foreground { color: #d4a574; }
+.planet .text-primary { color: #c2410c; }
+.planet .text-muted-foreground { color: #8a7a6a; }
+.planet .text-amber-500, .planet .text-amber-400 { color: #f59e0b; }
+
+/* ── 18. DropdownMenu / Popover content ── */
+.planet [data-radix-menu-content],
+.planet [class*="DropdownMenuContent"],
+.planet [class*="PopoverContent"] {
+    background: #1a0e0a;
+    border-color: rgba(212, 165, 116, 0.15);
+}

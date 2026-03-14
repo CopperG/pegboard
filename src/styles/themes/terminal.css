@@ -1,0 +1,351 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Terminal — 复古终端
+   Class: .terminal
+   Style: 绿色磷光、CRT扫描线、终端窗口风格、复古黑客美学
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font — 等宽字体，一切皆终端 ── */
+.terminal {
+    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    letter-spacing: 0em;
+}
+
+/* ── 2. Color Variables — 磷光绿 + 琥珀色点缀 ── */
+.terminal {
+    /* 基础色 — 近黑底色，微带绿色磷光 */
+    --background: #0a0f0a;
+    --foreground: #44ee66;
+
+    /* 卡片 — 终端窗口底色
+       Note: alpha moved to [data-panel] direct rule; variable must be opaque
+       for Tailwind bg-card/50 opacity modifiers to work correctly. */
+    --card: #080d08;
+    --card-foreground: #44ee66;
+
+    /* 弹层 — 终端弹窗 */
+    --popover: #080d08;
+    --popover-foreground: #44ee66;
+
+    /* 主色 — 磷光绿 */
+    --primary: #33cc55;
+    --primary-foreground: #0a0f0a;
+
+    /* 次色 — 暗绿底色 */
+    --secondary: #1a5528;
+    --secondary-foreground: #44ee66;
+
+    /* 静音色 — 暗淡绿 */
+    --muted: #1a5528;
+    --muted-foreground: #228838;
+
+    /* 强调色 — 琥珀色，用于警告和高亮 */
+    --accent: #f59e0b;
+    --accent-foreground: #0a0f0a;
+
+    /* 危险色 — 红色报错，终端 stderr */
+    --destructive: oklch(0.60 0.22 25);
+
+    /* 边框 — 暗绿线条 */
+    --border: rgba(34, 136, 56, 0.3);
+    --input: #0a0f0a;
+    --ring: #33cc55;
+
+    /* 图表 — 绿色/琥珀色系列，模拟示波器 */
+    --chart-1: #33cc55;
+    --chart-2: #f59e0b;
+    --chart-3: #228838;
+    --chart-4: #44ee66;
+    --chart-5: #1a5528;
+
+    /* 侧栏 — 更深的终端底色 */
+    --sidebar: #060a06;
+    --sidebar-foreground: #33cc55;
+    --sidebar-primary: #33cc55;
+    --sidebar-primary-foreground: #0a0f0a;
+    --sidebar-accent: #1a5528;
+    --sidebar-accent-foreground: #44ee66;
+    --sidebar-border: rgba(34, 136, 56, 0.25);
+    --sidebar-ring: #33cc55;
+}
+
+/* ── 3. Canvas — CRT 显示器背景，磷光暗角 ── */
+.terminal [data-app-shell] {
+    background:
+        /* 中心磷光辉光 — 模拟 CRT 电子束聚焦点 */
+        radial-gradient(
+            ellipse at 50% 50%,
+            rgba(26, 85, 40, 0.25) 0%,
+            transparent 65%
+        ),
+        /* 四角暗角 — CRT 显示器天然的边缘暗化 */
+        radial-gradient(
+            ellipse at 50% 50%,
+            transparent 40%,
+            rgba(6, 10, 6, 0.70) 100%
+        ),
+        /* 底色 — 近黑绿 */
+        #080d08;
+    position: relative;
+}
+
+/* ── 4. Panel — 终端窗口风格，绿色边框 + 无阴影（仅 hover 时发光） ── */
+.terminal [data-panel] {
+    background: rgba(10, 15, 10, 0.90);
+    border: 1px solid rgba(51, 204, 85, 0.45);
+    border-radius: 2px;
+    box-shadow: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* 面板顶部标题栏 — 终端标题条效果，含微弱绿色底色 */
+.terminal [data-panel] [data-panel-header] {
+    background: rgba(51, 204, 85, 0.06);
+    border-bottom: 1px solid rgba(34, 136, 56, 0.15);
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.40);
+}
+
+.terminal [data-panel]:hover {
+    border-color: rgba(51, 204, 85, 0.35);
+    box-shadow: 0 0 12px rgba(51, 204, 85, 0.06);
+}
+
+/* ── 5. Sidebar — 深色终端侧栏，绿色高亮 ── */
+.terminal aside[aria-label="Panel navigation"] {
+    background: #060a06;
+    border-right: 1px solid rgba(34, 136, 56, 0.15);
+    box-shadow:
+        1px 0 8px rgba(0, 0, 0, 0.40),
+        /* 右侧边缘微弱磷光 */
+        1px 0 3px rgba(51, 204, 85, 0.04);
+}
+
+/* ── 6. Scrollbar — 磷光绿色调 ── */
+.terminal ::-webkit-scrollbar-thumb {
+    background: rgba(51, 204, 85, 0.18);
+    border-radius: 1px;
+}
+.terminal ::-webkit-scrollbar-thumb:hover {
+    background: rgba(51, 204, 85, 0.35);
+}
+.terminal {
+    scrollbar-color: rgba(51, 204, 85, 0.18) transparent;
+}
+
+/* ── 7. Special — CRT 特效层：扫描线、屏幕闪烁、扫描线扫掠、文字辉光、光标闪烁 ── */
+
+/* --- 7a. CRT 扫描线 — 已移除 --- */
+
+/* --- 7b. 屏幕闪烁 — 快速微闪 0.08s --- */
+.terminal [data-app-shell]::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--z-noise);
+    background: transparent;
+    animation: terminal-flicker 0.08s linear infinite alternate;
+}
+
+@keyframes terminal-flicker {
+    0% {
+        opacity: 0.98;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* --- 7c. 扫描线扫掠 — 一条亮线从上到下缓慢扫过 --- */
+@keyframes terminal-scanline-sweep {
+    0% { top: -5%; }
+    100% { top: 105%; }
+}
+
+.terminal .scanline-sweep {
+    position: fixed;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(180deg, transparent, rgba(51, 204, 85, 0.04), transparent);
+    z-index: 10000;
+    pointer-events: none;
+    animation: terminal-scanline-sweep 6s linear infinite;
+}
+
+/* --- 7d. 文字辉光 — 磷光绿 text-shadow，终端的标志性效果 --- */
+
+/* 面板内主要文字 — 微弱绿色辉光 */
+.terminal [data-panel] {
+    text-shadow: 0 0 2px rgba(51, 204, 85, 0.15);
+}
+
+/* 主色文字 — 更明显的辉光，如标题和重要信息 */
+.terminal [data-panel] h1,
+.terminal [data-panel] h2,
+.terminal [data-panel] h3,
+.terminal [data-panel] strong {
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.40);
+}
+
+/* 侧栏文字辉光 */
+.terminal aside[aria-label="Panel navigation"] {
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.12);
+}
+
+/* --- 7e. 光标闪烁动画 — 终端经典的块状光标 --- */
+@keyframes terminal-cursor-blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* 可用于自定义光标元素 */
+.terminal .terminal-cursor {
+    display: inline-block;
+    width: 7px;
+    height: 14px;
+    background: #33cc55;
+    animation: terminal-cursor-blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+    box-shadow: 0 0 4px rgba(51, 204, 85, 0.30);
+}
+
+/* --- 7f. 输入框终端风格 — 模拟命令行输入区 --- */
+.terminal input,
+.terminal textarea {
+    caret-color: #33cc55;
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.12);
+}
+
+/* --- 7g. 选中文本 — 绿色高亮块 --- */
+.terminal ::selection {
+    background: rgba(51, 204, 85, 0.25);
+    color: #44ee66;
+}
+
+/* --- 7h. 链接 — 琥珀色 + 辉光 --- */
+.terminal a {
+    color: #f59e0b;
+    text-shadow: 0 0 6px rgba(245, 158, 11, 0.20);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(245, 158, 11, 0.40);
+}
+.terminal a:hover {
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+    border-bottom-style: solid;
+}
+
+/* --- 7i. 代码块 — 加深底色，更明显的终端感 --- */
+.terminal pre,
+.terminal code {
+    background: #060a06 !important;
+    border: 1px solid rgba(34, 136, 56, 0.15);
+    text-shadow: 0 0 2px rgba(51, 204, 85, 0.15);
+}
+
+/* --- 7j. 表格 — 终端表格样式，用字符边框感 --- */
+.terminal table {
+    border-color: rgba(34, 136, 56, 0.15);
+}
+.terminal th {
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.85em;
+    border-bottom: 1px solid rgba(34, 136, 56, 0.15);
+}
+.terminal td {
+    border-bottom: 1px solid rgba(51, 204, 85, 0.06);
+}
+.terminal tr:hover td {
+    background: rgba(51, 204, 85, 0.04);
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.40);
+}
+
+/* --- 7k. 按钮 — 终端风格边框按钮 --- */
+.terminal button[data-primary] {
+    text-shadow: 0 0 6px rgba(51, 204, 85, 0.30);
+    box-shadow: 0 0 8px rgba(51, 204, 85, 0.10);
+}
+
+/* --- 7l. 磷光绿图标辉光 --- */
+.terminal svg {
+    filter: drop-shadow(0 0 3px rgba(51, 204, 85, 0.15));
+}
+
+/* --- 7m. CRT 显示器弧面曲率 --- */
+.terminal [data-app-shell] {
+    border-radius: 20px / 30px;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.50), inset 0 0 20px rgba(51, 204, 85, 0.02);
+}
+
+/* --- 7n. 占位符 — 绿色终端风格 --- */
+.terminal .react-grid-placeholder {
+    background: rgba(51, 204, 85, 0.10) !important;
+    border: 1px solid rgba(51, 204, 85, 0.25) !important;
+    border-radius: 2px;
+}
+
+/* --- 7o. Content text — !important hex 确保 WebKit 可读 --- */
+.terminal [data-panel] h1,
+.terminal [data-panel] h2,
+.terminal [data-panel] h3,
+.terminal [data-panel] h4,
+.terminal [data-panel] h5,
+.terminal [data-panel] h6 {
+    color: #4ade80 !important;
+}
+.terminal [data-panel] p {
+    color: #22c55e !important;
+}
+.terminal [data-panel] li {
+    color: #22c55e !important;
+}
+.terminal [data-panel] strong,
+.terminal [data-panel] b {
+    color: #4ade80 !important;
+}
+.terminal [data-panel] a {
+    color: #fbbf24 !important;
+}
+.terminal [data-panel] blockquote {
+    color: #16a34a !important;
+    border-left-color: rgba(51, 204, 85, 0.25) !important;
+}
+.terminal [data-panel] :not(pre) > code {
+    color: #4ade80 !important;
+    background: rgba(34, 197, 94, 0.08) !important;
+}
+.terminal [data-panel] pre code {
+    color: #22c55e !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* Prose 变量 — 磷光绿色调 */
+.terminal .prose {
+    --tw-prose-body: #22c55e;
+    --tw-prose-headings: #4ade80;
+    --tw-prose-links: #fbbf24;
+    --tw-prose-bold: #4ade80;
+    --tw-prose-code: #4ade80;
+    --tw-prose-quotes: #16a34a;
+    --tw-prose-counters: #16a34a;
+    --tw-prose-bullets: #22c55e;
+    --tw-prose-hr: rgba(34, 136, 56, 0.15);
+}
+
+/* 底部渐变 — hex 修复 oklch 解析问题 */
+.terminal [data-panel] .absolute.bottom-0.pointer-events-none {
+    background: linear-gradient(to top, #0d150d, transparent) !important;
+}
+
+/* --- 7p. 拖拽状态 — 绿色辉光 --- */
+.terminal .react-grid-item.react-draggable-dragging [data-panel] {
+    border-color: rgba(51, 204, 85, 0.50) !important;
+    box-shadow: 0 0 20px rgba(51, 204, 85, 0.15), 0 8px 24px rgba(0, 0, 0, 0.40) !important;
+}

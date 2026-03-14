@@ -1,0 +1,32 @@
+{
+  "name": "@lobster/pegboard-channel",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "OpenClaw channel adapter for Lobster PegBoard desktop canvas",
+  "license": "MIT",
+  "files": [
+    "index.ts",
+    "src/**/*.ts",
+    "openclaw.plugin.json"
+  ],
+  "openclaw": {
+    "extensions": [
+      "./index.ts"
+    ],
+    "channel": {
+      "id": "lobster-pegboard",
+      "label": "Lobster PegBoard",
+      "selectionLabel": "Lobster PegBoard (龙虾洞洞板)",
+      "blurb": "Lobster PegBoard desktop canvas channel.",
+      "order": 90
+    }
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^25.0.10",
+    "typescript": "^5.7.0"
+  },
+  "peerDependencies": {
+    "openclaw": ">=2026.2.13"
+  }
+}

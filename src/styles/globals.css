@@ -1,0 +1,303 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@plugin "@tailwindcss/typography";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/lora";
+@import "@fontsource-variable/quicksand";
+@import "@fontsource-variable/geist-mono";
+@import "@fontsource/special-elite";
+@import "@fontsource/courier-prime";
+@import "@fontsource-variable/caveat";
+@import "@fontsource/patrick-hand";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/fira-code";
+@import "@fontsource-variable/orbitron";
+
+/* ── Theme files ── */
+@import "./themes/frost.css";
+@import "./themes/dark.css";
+@import "./themes/vintage.css";
+@import "./themes/doodle.css";
+@import "./themes/blaze.css";
+
+@custom-variant dark (&:is(.dark *, .doodle *, .blaze *));
+
+/* z-index scale — always available */
+:root {
+    --z-sticky: 10;
+    --z-dropdown: 30;
+    --z-overlay: 40;
+    --z-modal: 50;
+    --z-toast: 60;
+    --z-noise: 70;
+    --radius: 0.875rem;
+}
+
+/* ── Default = Frost theme (light) — in @layer so theme classes can override ── */
+@layer base {
+  :root {
+    --background: oklch(0.95 0.012 260);
+    --foreground: oklch(0.18 0.015 260);
+    --card: oklch(0.99 0.005 260);
+    --card-foreground: oklch(0.18 0.015 260);
+    --popover: oklch(0.99 0.005 260);
+    --popover-foreground: oklch(0.18 0.015 260);
+    --primary: oklch(0.55 0.20 265);
+    --primary-foreground: oklch(0.98 0 0);
+    --secondary: oklch(0.93 0.008 260);
+    --secondary-foreground: oklch(0.18 0.015 260);
+    --muted: oklch(0.93 0.008 260);
+    --muted-foreground: oklch(0.62 0.025 260);
+    --accent: oklch(0.93 0.015 260);
+    --accent-foreground: oklch(0.18 0.015 260);
+    --destructive: oklch(0.58 0.22 27);
+    --border: oklch(0.88 0.012 260);
+    --input: oklch(0.96 0.006 260);
+    --ring: oklch(0.55 0.20 265);
+    --chart-1: oklch(0.55 0.20 265);
+    --chart-2: oklch(0.72 0.15 168);
+    --chart-3: oklch(0.65 0.18 38);
+    --chart-4: oklch(0.55 0.22 300);
+    --chart-5: oklch(0.78 0.16 85);
+    --sidebar: oklch(0.94 0.012 260);
+    --sidebar-foreground: oklch(0.18 0.015 260);
+    --sidebar-primary: oklch(0.55 0.20 265);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.96 0.006 260);
+    --sidebar-accent-foreground: oklch(0.18 0.015 260);
+    --sidebar-border: oklch(0.88 0.012 260);
+    --sidebar-ring: oklch(0.55 0.20 265);
+
+    /* ── Panel semantic colors — themes can override ── */
+    --panel-star: oklch(0.769 0.188 70);
+    --panel-status-success: oklch(0.723 0.191 142);
+    --panel-status-warning: oklch(0.795 0.184 86);
+    --panel-status-error: oklch(0.637 0.237 25);
+    --panel-status-info: oklch(0.623 0.214 260);
+    --panel-copy-success: oklch(0.696 0.17 162);
+    --panel-overlay: oklch(0 0 0);
+    --panel-overlay-text: oklch(1 0 0);
+    --panel-calendar-event-text: oklch(1 0 0);
+  }
+}
+
+@theme inline {
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    /* Panel semantic colors — Tailwind utilities */
+    --color-panel-star: var(--panel-star);
+    --color-panel-status-success: var(--panel-status-success);
+    --color-panel-status-warning: var(--panel-status-warning);
+    --color-panel-status-error: var(--panel-status-error);
+    --color-panel-status-info: var(--panel-status-info);
+    --color-panel-copy-success: var(--panel-copy-success);
+    --color-panel-overlay: var(--panel-overlay);
+    --color-panel-overlay-text: var(--panel-overlay-text);
+}
+
+@layer utilities {
+  .typo-page-title { @apply text-lg font-semibold; }
+  .typo-section-title { @apply text-base font-medium; }
+  .typo-card-title { @apply text-sm font-medium; }
+  .typo-label { @apply text-xs font-medium text-muted-foreground; }
+  .typo-body { @apply text-sm; }
+  .typo-caption { @apply text-xs text-muted-foreground; }
+  .typo-mono { @apply text-xs font-mono; }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: thin;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    scrollbar-color: oklch(0.5 0 0 / 0.15) transparent;
+    }
+
+  /* Default panel styling — themes override via .[theme] [data-panel] */
+  [data-panel] {
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 1px 3px oklch(0 0 0 / 5%);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+  [data-panel]:hover {
+    box-shadow: 0 4px 12px oklch(0 0 0 / 8%);
+  }
+
+  /* WebKit scrollbar (Chrome / Safari / Tauri WebView) */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(0.5 0 0 / 0.12);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.5 0 0 / 0.25);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* ── Code line highlight (theme-aware) ───────────────────────────── */
+.code-line-highlight {
+  background-color: oklch(from var(--color-primary) l c h / 0.12);
+  display: inline-block;
+  width: 100%;
+}
+
+/* ── Panel badge colors — theme-overridable ─────────────────────── */
+.panel-badge-red {
+  background-color: oklch(from var(--panel-status-error) l c h / 0.1);
+  color: var(--panel-status-error);
+  box-shadow: 0 0 0 1px oklch(from var(--panel-status-error) l c h / 0.2);
+}
+.panel-badge-green {
+  background-color: oklch(from var(--panel-status-success) l c h / 0.1);
+  color: var(--panel-status-success);
+  box-shadow: 0 0 0 1px oklch(from var(--panel-status-success) l c h / 0.2);
+}
+.panel-badge-blue {
+  background-color: oklch(from var(--color-primary) l c h / 0.1);
+  color: var(--color-primary);
+  box-shadow: 0 0 0 1px oklch(from var(--color-primary) l c h / 0.2);
+}
+.panel-badge-yellow {
+  background-color: oklch(from var(--panel-status-warning) l c h / 0.1);
+  color: var(--panel-status-warning);
+  box-shadow: 0 0 0 1px oklch(from var(--panel-status-warning) l c h / 0.2);
+}
+.panel-badge-gray {
+  background-color: oklch(from var(--color-muted) l c h / 0.6);
+  color: var(--color-muted-foreground);
+  box-shadow: 0 0 0 1px oklch(from var(--color-border) l c h / 0.3);
+}
+
+@keyframes panel-focus-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 oklch(from var(--color-primary) l c h / 0); }
+  50% { box-shadow: 0 0 0 4px oklch(from var(--color-primary) l c h / 0.5); }
+}
+
+.panel-focused {
+  animation: panel-focus-pulse 0.3s ease-in-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-focus-pulse {
+    animation: none !important;
+  }
+}
+
+/* ── react-grid-layout placeholder ────────────────────────────────── */
+.react-grid-placeholder {
+  background: var(--color-primary) !important;
+  opacity: 0.08 !important;
+  border-radius: 0.75rem;
+}
+
+/* ── react-big-calendar theme ─────────────────────────────────────── */
+.rbc-theme .rbc-calendar {
+  font-family: inherit;
+}
+.rbc-theme .rbc-toolbar {
+  display: none;
+}
+.rbc-theme .rbc-header {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  border-color: var(--color-border);
+}
+.rbc-theme .rbc-month-view,
+.rbc-theme .rbc-time-view {
+  border-color: var(--color-border);
+}
+.rbc-theme .rbc-day-bg + .rbc-day-bg,
+.rbc-theme .rbc-month-row + .rbc-month-row {
+  border-color: var(--color-border);
+}
+.rbc-theme .rbc-off-range-bg {
+  background-color: oklch(from var(--color-muted) l c h / 0.3);
+}
+.rbc-theme .rbc-today {
+  background-color: oklch(from var(--color-primary) l c h / 0.08);
+}
+.rbc-theme .rbc-event {
+  border-radius: 4px;
+  font-size: 0.7rem;
+  padding: 1px 4px;
+}
+.rbc-theme .rbc-date-cell {
+  font-size: 0.75rem;
+  color: var(--color-foreground);
+  padding: 2px 4px;
+}
+.rbc-theme .rbc-time-content,
+.rbc-theme .rbc-time-header-content {
+  border-color: var(--color-border);
+}
+.rbc-theme .rbc-timeslot-group {
+  border-color: var(--color-border);
+}
+.rbc-theme .rbc-time-slot,
+.rbc-theme .rbc-label {
+  font-size: 0.7rem;
+  color: var(--color-muted-foreground);
+}
+.rbc-theme .rbc-allday-cell {
+  display: none;
+}
+.rbc-theme .rbc-time-header-gutter {
+  border-color: var(--color-border);
+}

@@ -1,0 +1,18 @@
+{
+  "all": "全部",
+  "important": "重要",
+  "daily": "日常",
+  "work": "工作",
+  "entertainment": "娱乐",
+  "other": "其他",
+  "panel_count": "{{count}} 个面板",
+  "no_panels": "暂无面板",
+  "no_category_panels": "该分类下暂无面板，Agent 可通过 tags 字段分配面板分类",
+  "waiting_connection": "等待 OpenClaw 连接...",
+  "ensure_openclaw": "请确保 OpenClaw 已启动并加载了 pegboard skill",
+  "retry_connection": "重试连接",
+  "added_to_category": "已添加到「{{category}}」",
+  "already_in_category": "已在该分类中",
+  "toggle_sidebar": "面板列表",
+  "toggle_chat": "聊天"
+}

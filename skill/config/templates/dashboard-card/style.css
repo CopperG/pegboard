@@ -1,0 +1,64 @@
+.dashboard-card {
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(135deg, var(--color-background) 0%, var(--color-muted) 100%);
+  border: 1px solid var(--color-border);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.card-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-trend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+}
+
+.card-trend.up {
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+}
+
+.card-trend.down {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+}
+
+.card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-foreground);
+  line-height: 1.2;
+  margin-bottom: 0.25rem;
+}
+
+.card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-foreground);
+  margin-bottom: 0.5rem;
+}
+
+.card-footer {
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.card-subtitle {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}

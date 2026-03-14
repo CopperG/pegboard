@@ -1,0 +1,471 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Vintage — 档案馆 Archive
+   Class: .vintage
+   Style: 衬线字体、亚麻纸纹理、索引卡面板、暖黄氛围灯、橄榄绿+金色
+   Prototype source: output/prototype-vintage.html — Direction B
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font — 衬线主字体 + Special Elite 打字机风格 ── */
+.vintage {
+    font-family: 'Lora', 'Songti SC', 'Noto Serif CJK SC', 'Source Han Serif SC', Georgia, serif;
+    line-height: 1.7;
+}
+/* 标题、元数据、标签等使用 Special Elite 打字机风格 */
+.vintage [data-panel-header],
+.vintage [data-panel-meta],
+.vintage .panel-timestamp,
+.vintage .badge {
+    font-family: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+/* ── 2. Color Variables — 暖色档案馆色调，橄榄绿主色+金色点缀 ── */
+/*
+   Prototype hex → oklch mapping:
+   #f0ead6 (bg)         → oklch(0.93 0.025 90)
+   #e8e0c8 (bg-warm)    → oklch(0.90 0.03 88)
+   #33301e (fg)          → oklch(0.25 0.03 95)
+   #78735a (fg-muted)    → oklch(0.52 0.04 95)
+   #faf7ee (card)        → oklch(0.97 0.015 90)
+   #fdfbf4 (card-hover)  → oklch(0.98 0.012 90)
+   #c8bf9e (border)      → oklch(0.79 0.04 88)
+   #ddd8c4 (border-lt)   → oklch(0.87 0.03 90)
+   #4a5a2b (accent)      → oklch(0.40 0.08 128)
+   #b8860b (accent-gold) → oklch(0.62 0.14 85)
+   #8b4513 (stamp)       → oklch(0.42 0.12 55)
+   #eee8d2 (code-bg)     → oklch(0.92 0.025 88)
+*/
+.vintage {
+    /* 基础色 — 羊皮纸/亚麻底色 (#f0ead6) */
+    --background: oklch(0.93 0.025 90);
+    --foreground: oklch(0.25 0.03 95);
+
+    /* 卡片 — 微黄白索引卡 (#faf7ee) */
+    --card: oklch(0.97 0.015 90);
+    --card-foreground: oklch(0.25 0.03 95);
+
+    /* 弹层 */
+    --popover: oklch(0.96 0.02 90);
+    --popover-foreground: oklch(0.25 0.03 95);
+
+    /* 主色 — 深橄榄绿 (#4a5a2b) */
+    --primary: oklch(0.40 0.08 128);
+    --primary-foreground: oklch(0.93 0.025 90);
+
+    /* 次色 — 暖亚麻 (#e8e0c8) */
+    --secondary: oklch(0.90 0.03 88);
+    --secondary-foreground: oklch(0.40 0.08 128);
+
+    /* 静音色 */
+    --muted: oklch(0.87 0.03 90);
+    --muted-foreground: oklch(0.52 0.04 95);
+
+    /* 强调色 — 金色 (#b8860b) */
+    --accent: oklch(0.62 0.14 85);
+    --accent-foreground: oklch(0.25 0.03 95);
+
+    /* 危险色 — 暗红 */
+    --destructive: oklch(0.50 0.18 25);
+
+    /* 边框/输入/环 (#c8bf9e / #ddd8c4) */
+    --border: oklch(0.79 0.04 88);
+    --input: oklch(0.87 0.03 90);
+    --ring: oklch(0.40 0.08 128);
+
+    /* 印章色 — 鞍棕 (#8b4513) */
+    --stamp: oklch(0.42 0.12 55);
+
+    /* 圆角 — 档案馆风格偏方正 */
+    --radius: 4px;
+
+    /* 图表 — 大地色系（橄榄、金、赤陶、赭石、鼠尾草） */
+    --chart-1: oklch(0.40 0.08 128);
+    --chart-2: oklch(0.62 0.14 85);
+    --chart-3: oklch(0.55 0.12 45);
+    --chart-4: oklch(0.48 0.08 55);
+    --chart-5: oklch(0.58 0.06 140);
+
+    /* 侧栏 — 暖纸张色 (#e8e0c8) */
+    --sidebar: oklch(0.90 0.03 88);
+    --sidebar-foreground: oklch(0.25 0.03 95);
+    --sidebar-primary: oklch(0.40 0.08 128);
+    --sidebar-primary-foreground: oklch(0.93 0.025 90);
+    --sidebar-accent: oklch(0.87 0.03 90);
+    --sidebar-accent-foreground: oklch(0.25 0.03 95);
+    --sidebar-border: oklch(0.79 0.04 88);
+    --sidebar-ring: oklch(0.40 0.08 128);
+}
+
+/* ── 3. Canvas — 亚麻条纹 + 羊皮纸渐变 + 咖啡渍装饰 ── */
+.vintage [data-app-shell] {
+    background:
+        /* 咖啡渍环 — 装饰性印迹 (prototype: .dir-b .canvas-area::after, radial-gradient ring) */
+        radial-gradient(
+            ellipse 90px 90px at 82% 12%,
+            transparent 35%,
+            oklch(0.58 0.06 75 / 6%) 38%,
+            oklch(0.58 0.06 75 / 10%) 42%,
+            oklch(0.58 0.06 75 / 4%) 50%,
+            transparent 55%
+        ),
+        /* 亚麻条纹 — 水平方向, 2px/4px 间距, opacity 0.06 (匹配原型 rgba(180,168,140,0.06)) */
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            oklch(0.72 0.04 85 / 6%) 2px,
+            oklch(0.72 0.04 85 / 6%) 4px
+        ),
+        /* 基底渐变 — 135deg 从 #f0ead6 到 #e8e0c8 (匹配原型) */
+        linear-gradient(
+            135deg,
+            oklch(0.93 0.025 90) 0%,
+            oklch(0.90 0.03 88) 50%,
+            oklch(0.93 0.025 90) 100%
+        );
+}
+
+/* ── 4. Panel — 索引卡样式（微暖白底、简洁阴影、文件夹标签页） ── */
+.vintage [data-panel] {
+    background: oklch(0.97 0.015 90);
+    border-color: oklch(0.79 0.04 88);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 2px;
+    /* 简洁阴影 — 匹配原型 1px 2px 6px rgba(74,90,43,0.10) */
+    box-shadow: 1px 2px 6px oklch(0.40 0.08 128 / 10%);
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+    position: relative;
+    overflow: visible;
+}
+
+/* 文件夹标签 — 面板顶部的圆角索引标签 (prototype: .dir-b .panel::before) */
+.vintage [data-panel]::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 14px;
+    width: 48px;
+    height: 8px;
+    background: oklch(0.97 0.015 90);
+    border: 1px solid oklch(0.79 0.04 88);
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+}
+
+.vintage [data-panel]:hover {
+    box-shadow: 2px 4px 12px oklch(0.40 0.08 128 / 16%);
+    transform: translateY(-1px);
+}
+
+/* 标签悬停时也跟随 */
+.vintage [data-panel]:hover::before {
+    background: oklch(0.98 0.012 90);
+}
+
+/* 面板标题 — Special Elite 打字机风格, 虚线底边框 (prototype: .dir-b .panel-header) */
+.vintage [data-panel-header] {
+    border-bottom: 1px dashed oklch(0.87 0.03 90);
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    letter-spacing: 1px;
+    padding-top: 14px;
+}
+
+/* 面板类型标签 — 金色 (prototype: .dir-b .panel-header .panel-type → color: var(--b-accent-gold)) */
+.vintage [data-panel-type] {
+    color: oklch(0.62 0.14 85);
+    font-family: 'Courier Prime', monospace;
+}
+/* HTML sandbox badge in panel header — 金色打字机风格 */
+.vintage [data-panel-header] .font-mono {
+    color: oklch(0.62 0.14 85);
+    font-family: 'Courier Prime', monospace;
+    background: oklch(0.62 0.14 85 / 10%);
+}
+
+/* 面板标题文字 — 确保衬线体 */
+.vintage [data-panel-header] [role="heading"] {
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    color: oklch(0.25 0.03 95);
+}
+
+/* 面板图标 — 橄榄绿 */
+.vintage [data-panel-header] > span.text-muted-foreground {
+    color: oklch(0.40 0.08 128);
+}
+
+/* ── 5. Sidebar — 暖纸张底色，简洁边框 ── */
+/* 面板列表侧栏 (prototype: .dir-b .sidebar) */
+.vintage aside[aria-label="Panel navigation"] {
+    background: oklch(0.90 0.03 88);
+    background-color: oklch(0.90 0.03 88);
+    border-right: 1px solid oklch(0.79 0.04 88);
+}
+
+/* 标签栏侧栏 — CanvasTabs 左侧窄栏 (prototype: .dir-b .sidebar) */
+.vintage [data-app-shell] > .flex.flex-col.items-center {
+    background: oklch(0.90 0.03 88);
+    background-color: oklch(0.90 0.03 88);
+    border-right: 1px solid oklch(0.79 0.04 88);
+}
+
+/* 标签栏 active 指示条 — 实心橄榄绿 + 亮色文字
+   (prototype: .dir-b .sidebar-icon.active { background: var(--b-accent); color: #f0ead6 }) */
+.vintage [data-app-shell] [role="tablist"] [aria-selected="true"] {
+    background: oklch(0.40 0.08 128);
+    background-color: oklch(0.40 0.08 128);
+    color: oklch(0.93 0.025 90);
+    border-radius: 6px;
+}
+
+/* Active indicator bar — cream color on solid olive bg */
+.vintage [data-app-shell] [role="tablist"] [aria-selected="true"] > span {
+    background-color: oklch(0.93 0.025 90);
+}
+
+/* 标签栏 hover — 微暖底 (prototype: .dir-b .sidebar-icon:hover) */
+.vintage [data-app-shell] [role="tablist"] button:hover {
+    background: oklch(0.40 0.08 128 / 8%);
+    background-color: oklch(0.40 0.08 128 / 8%);
+    color: oklch(0.40 0.08 128);
+}
+
+/* 标签栏 active hover — 保持实心橄榄绿 */
+.vintage [data-app-shell] [role="tablist"] [aria-selected="true"]:hover {
+    background: oklch(0.40 0.08 128);
+    background-color: oklch(0.40 0.08 128);
+    color: oklch(0.93 0.025 90);
+}
+
+/* 侧栏面板列表项 — 暖色悬浮 */
+.vintage aside[aria-label="Panel navigation"] [role="button"]:hover,
+.vintage aside[aria-label="Panel navigation"] button:hover {
+    background-color: oklch(0.90 0.03 88 / 60%);
+}
+
+/* ── 6. Scrollbar — 橄榄绿调（匹配原型 rgba(74,90,43,...) 色系） ── */
+.vintage ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.vintage ::-webkit-scrollbar-track {
+    background: transparent;
+}
+.vintage ::-webkit-scrollbar-thumb {
+    background: oklch(0.40 0.08 128 / 15%);
+    border-radius: 999px;
+}
+.vintage ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.40 0.08 128 / 30%);
+}
+.vintage {
+    scrollbar-color: oklch(0.40 0.08 128 / 15%) transparent;
+}
+
+/* ── 7. Special — 纸张纹理叠层、复古印章、打字机样式 ── */
+
+/* 全局纸张颗粒感 — 用 repeating-conic-gradient 模拟纸张肌理 (匹配原型 SVG feTurbulence opacity: 0.03) */
+.vintage [data-app-shell]::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: var(--z-noise);
+    opacity: 0.03;
+    background-image:
+        repeating-conic-gradient(
+            oklch(0.50 0.03 85) 0% 25%,
+            transparent 0% 50%
+        );
+    background-size: 4px 4px;
+    mix-blend-mode: multiply;
+}
+
+/* 复古印章/徽章样式 — 匹配原型: Special Elite, #8b4513, rotate(-3deg), opacity 0.7 */
+.vintage .vintage-stamp {
+    display: inline-block;
+    padding: 2px 8px;
+    border: 2px solid var(--stamp);
+    border-radius: 3px;
+    color: var(--stamp);
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transform: rotate(-3deg);
+    opacity: 0.7;
+}
+
+/* 金色高亮标记 — 模拟荧光笔批注 */
+.vintage .vintage-highlight {
+    background: linear-gradient(
+        to bottom,
+        transparent 55%,
+        oklch(0.80 0.12 85 / 30%) 55%,
+        oklch(0.80 0.12 85 / 30%) 90%,
+        transparent 90%
+    );
+    padding: 0 2px;
+}
+
+/* 档案编号样式 — 打字机风格的编号标签 */
+.vintage .vintage-ref {
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: oklch(0.52 0.04 95);
+    text-transform: uppercase;
+    border-bottom: 1px dashed oklch(0.79 0.04 88);
+    padding-bottom: 1px;
+}
+
+/* ── Content-level: 表格 ── */
+/* 匹配原型 .dir-b .vtable th: bg-warm + accent color + Special Elite + solid bottom border */
+.vintage table th {
+    background: oklch(0.90 0.03 88);
+    color: oklch(0.40 0.08 128);
+    border-bottom: 1px solid oklch(0.79 0.04 88);
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    letter-spacing: 1px;
+}
+/* 匹配原型 .dir-b .vtable td: dashed bottom border */
+.vintage table td {
+    border-bottom: 1px dashed oklch(0.87 0.03 90);
+}
+/* 匹配原型 .dir-b .vtable tr:hover td: rgba(184,134,11,0.06) gold hover */
+.vintage table tr:hover td {
+    background: oklch(0.62 0.14 85 / 6%);
+}
+
+/* ── Content-level: 代码块 ── */
+/* 匹配原型 .dir-b .code-block: Special Elite typewriter, #eee8d2 bg,
+   border 1px solid border-light, letter-spacing 0.5px, line-height 1.9 */
+.vintage pre {
+    background: oklch(0.92 0.025 88);
+    border: 1px solid oklch(0.87 0.03 90);
+    border-left: 3px solid oklch(0.40 0.08 128);
+    font-family: 'Special Elite', 'Courier Prime', 'Courier New', monospace;
+    letter-spacing: 0.5px;
+    line-height: 1.9;
+}
+/* 内联代码 — 仅背景色 + 圆角, 不加左侧竖线 */
+.vintage :not(pre) > code {
+    background: oklch(0.92 0.025 88);
+    border: 1px solid oklch(0.87 0.03 90);
+    border-radius: 3px;
+    padding: 1px 6px;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+/* ── Content-level: 时间线 ── */
+/* 匹配原型: .dir-b .timeline::before — rail line color = border (#c8bf9e)
+   .dir-b .timeline-item::before — dot = accent-gold (#b8860b)
+   .dir-b .timeline-date — color: accent-gold + Special Elite */
+
+/* 时间轴时间标签 — 打字机风格 + 金色 */
+.vintage [data-panel] .font-mono.tabular-nums {
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+    color: oklch(0.62 0.14 85);
+}
+
+/* react-big-calendar 事件颜色 — 使用大地色图表色 */
+.vintage .rbc-theme .rbc-event {
+    background-color: oklch(0.40 0.08 128);
+    border: none;
+}
+.vintage .rbc-theme .rbc-today {
+    background-color: oklch(0.62 0.14 85 / 8%);
+}
+
+/* ── Content-level: KV 面板 ── */
+/* 匹配原型 .dir-b .kv-key: accent olive-green + Special Elite typewriter font */
+.vintage [data-panel] .text-muted-foreground.shrink-0 {
+    color: oklch(0.40 0.08 128);
+    font-family: 'Special Elite', 'Courier Prime', monospace;
+}
+
+/* ── Content-level: List 面板 ── */
+/* 匹配原型 .dir-b .check-box: square 2px radius, olive-green checked state */
+.vintage [data-panel] input[type="checkbox"] {
+    border-radius: 2px;
+    border-color: oklch(0.79 0.04 88);
+    accent-color: oklch(0.40 0.08 128);
+}
+.vintage [data-panel] input[type="checkbox"]:checked {
+    background-color: oklch(0.40 0.08 128);
+    border-color: oklch(0.40 0.08 128);
+}
+
+/* ── Content-level: Markdown prose ── */
+/* 链接 — 橄榄绿 + 虚线下划线 */
+.vintage a {
+    color: oklch(0.40 0.08 128);
+    text-decoration-style: dashed;
+    text-underline-offset: 3px;
+}
+.vintage a:hover {
+    color: oklch(0.62 0.14 85);
+}
+
+/* 引用块 — 金色左边框 + 暖底色 */
+.vintage blockquote {
+    border-left: 3px solid oklch(0.62 0.14 85);
+    background: oklch(0.90 0.03 88 / 50%);
+    padding: 0.5em 1em;
+    font-style: italic;
+    color: oklch(0.52 0.04 95);
+}
+
+/* 水平分隔线 — 虚线 */
+.vintage hr {
+    border: none;
+    border-top: 1px dashed oklch(0.79 0.04 88);
+}
+
+/* ── Interaction: 占位符 ── */
+/* 温暖纸张占位 */
+.vintage .react-grid-placeholder {
+    background: oklch(0.40 0.08 128 / 8%) !important;
+    border: 1px dashed oklch(0.40 0.08 128 / 25%) !important;
+    border-radius: 2px;
+}
+
+/* ── Interaction: 拖拽 ── */
+/* 微抬起 */
+.vintage .react-grid-item.react-draggable-dragging [data-panel] {
+    box-shadow: 3px 6px 16px oklch(0.40 0.08 128 / 20%) !important;
+    transform: translateY(-3px) !important;
+}
+
+/* ── Interaction: 选中文本 ── */
+/* 金色高亮 */
+.vintage ::selection {
+    background: oklch(0.62 0.14 85 / 20%);
+    color: oklch(0.25 0.03 95);
+}
+
+/* ── Content-level: Recharts 图表 ── */
+/* Recharts 使用 CSS 变量 --chart-1..5, 已在 Layer 2 定义.
+   额外保证 tooltip/legend 文字使用衬线体. */
+.vintage .recharts-default-tooltip {
+    background: oklch(0.97 0.015 90) !important;
+    border: 1px solid oklch(0.79 0.04 88) !important;
+    border-radius: 2px !important;
+    font-family: 'Lora', Georgia, serif;
+}
+.vintage .recharts-legend-item-text {
+    font-family: 'Lora', Georgia, serif !important;
+    color: oklch(0.25 0.03 95) !important;
+}
+/* 图表轴标签 — Lora 衬线 + muted 色 */
+.vintage .recharts-cartesian-axis-tick-value {
+    font-family: 'Lora', Georgia, serif;
+    fill: oklch(0.52 0.04 95);
+    font-size: 11px;
+}
+/* 图表网格线 — 暖色边框 */
+.vintage .recharts-cartesian-grid line {
+    stroke: oklch(0.87 0.03 90);
+}

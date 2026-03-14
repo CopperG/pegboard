@@ -1,0 +1,18 @@
+{
+  "all": "All",
+  "important": "Important",
+  "daily": "Daily",
+  "work": "Work",
+  "entertainment": "Fun",
+  "other": "Other",
+  "panel_count": "{{count}} panels",
+  "no_panels": "No panels",
+  "no_category_panels": "No panels in this category. Agent can assign panels via tags.",
+  "waiting_connection": "Waiting for OpenClaw connection...",
+  "ensure_openclaw": "Please ensure OpenClaw is running with pegboard skill loaded",
+  "retry_connection": "Retry connection",
+  "added_to_category": "Added to {{category}}",
+  "already_in_category": "Already in this category",
+  "toggle_sidebar": "Panel list",
+  "toggle_chat": "Chat"
+}

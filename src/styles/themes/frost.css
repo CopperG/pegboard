@@ -1,0 +1,346 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Frost — 冰霜毛玻璃
+   Class: .light
+   Style: 冷蓝调、毛玻璃面板、渐变网格背景、Indigo 主色
+
+   Prototype reference: output/prototype-light-frost.html
+   Key design tokens (hex → oklch mapping):
+     #f0f2f8  → oklch(0.95 0.012 260)    background
+     #1a1d27  → oklch(0.18 0.015 260)    foreground
+     #4a5068  → oklch(0.42 0.025 260)    fg-secondary
+     #8690a7  → oklch(0.62 0.025 260)    muted
+     #4a6cf7  → oklch(0.55 0.20 265)     primary / accent / indigo
+     #3b5de8  → oklch(0.50 0.20 265)     accent-hover
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font ── */
+/* Default sans (Geist Variable) — no override */
+
+/* ── 2. Color Variables ── */
+.light {
+    --background: oklch(0.95 0.012 260);
+    --foreground: oklch(0.18 0.015 260);
+
+    /* Card — semi-transparent white for glass morphism
+       Prototype: rgba(255,255,255,0.68).
+       Note: oklch with alpha won't work in Tailwind's color variable system
+       because Tailwind expects opaque oklch for --card and applies alpha itself.
+       We set an opaque approximation here; the actual glass effect is done via
+       direct rules on [data-panel] in Section 4. */
+    --card: oklch(0.99 0.005 260);
+    --card-foreground: oklch(0.18 0.015 260);
+
+    /* Popover — prototype: rgba(255,255,255,0.85) */
+    --popover: oklch(0.99 0.005 260);
+    --popover-foreground: oklch(0.18 0.015 260);
+
+    /* Primary — Indigo #4a6cf7 */
+    --primary: oklch(0.55 0.20 265);
+    --primary-foreground: oklch(0.98 0 0);
+
+    --secondary: oklch(0.93 0.008 260);
+    --secondary-foreground: oklch(0.18 0.015 260);
+
+    --muted: oklch(0.93 0.008 260);
+    --muted-foreground: oklch(0.62 0.025 260);
+
+    /* Accent — prototype says same as primary: oklch(0.55 0.20 265)
+       Tailwind uses --accent for hover-bg surfaces, so we keep a soft tint
+       for component backgrounds but the accent *color* matches primary. */
+    --accent: oklch(0.93 0.015 260);
+    --accent-foreground: oklch(0.18 0.015 260);
+
+    --destructive: oklch(0.58 0.22 27);
+
+    /* Border — prototype: rgba(160,175,210,0.30) ≈ oklch(0.75 0.02 260 / 30%)
+       Tailwind variable must be opaque for border-border utility.
+       We use a blended approximation; the real translucent border is applied
+       directly on [data-panel] in Section 4. */
+    --border: oklch(0.88 0.012 260);
+    --input: oklch(0.96 0.006 260);
+
+    /* Ring — prototype: oklch(0.55 0.20 265 / 40%) */
+    --ring: oklch(0.55 0.20 265);
+
+    /* Radius — prototype: 14px = 0.875rem */
+    --radius: 0.875rem;
+
+    /* Chart palette — prototype hex colors:
+       #4a6cf7, #22c997, #f7734a, #a855f7, #eab308 */
+    --chart-1: oklch(0.55 0.20 265);
+    --chart-2: oklch(0.72 0.15 168);
+    --chart-3: oklch(0.65 0.18 38);
+    --chart-4: oklch(0.55 0.22 300);
+    --chart-5: oklch(0.78 0.16 85);
+
+    /* Sidebar — prototype: rgba(235,238,248,0.75) ≈ oklch(0.94 0.01 260 / 75%)
+       Opaque approximation for Tailwind; real glass effect in Section 5. */
+    --sidebar: oklch(0.94 0.012 260);
+    --sidebar-foreground: oklch(0.18 0.015 260);
+    --sidebar-primary: oklch(0.55 0.20 265);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    /* Active sidebar item — prototype: rgba(255,255,255,0.55) */
+    --sidebar-accent: oklch(0.96 0.006 260);
+    --sidebar-accent-foreground: oklch(0.18 0.015 260);
+    /* Sidebar border — same translucent cool gray as card border */
+    --sidebar-border: oklch(0.88 0.012 260);
+    --sidebar-ring: oklch(0.55 0.20 265);
+}
+
+/* ── 3. Canvas — gradient mesh background ── */
+/* Prototype: 4-layer radial-gradient aurora
+   rgba(74,108,247,0.06), rgba(168,85,247,0.05), rgba(34,201,151,0.04), rgba(234,179,8,0.03)
+   on top of #f0f2f8 base */
+.light [data-app-shell] {
+    background:
+        radial-gradient(ellipse at 15% 30%, rgba(74, 108, 247, 0.06) 0%, transparent 55%),
+        radial-gradient(ellipse at 75% 15%, rgba(168, 85, 247, 0.05) 0%, transparent 45%),
+        radial-gradient(ellipse at 55% 75%, rgba(34, 201, 151, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 90% 85%, rgba(234, 179, 8, 0.03) 0%, transparent 40%),
+        oklch(0.95 0.012 260);
+}
+
+/* ── 4. Panel — glass morphism ── */
+/* Prototype card states:
+   Default:  bg white/68%, blur(20px), border rgba(160,175,210,0.30),
+             shadow 0 2px 12px rgba(30,50,100,0.05), radius 14px
+   Hover:    bg white/82%, border rgba(140,160,210,0.45),
+             shadow 0 8px 30px rgba(30,50,100,0.08), translateY(-1px)
+   Focused:  border rgba(74,108,247,0.40),
+             shadow md + 0 0 20px rgba(74,108,247,0.12)  */
+.light [data-panel] {
+    background: rgba(255, 255, 255, 0.68);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(160, 175, 210, 0.30);
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(30, 50, 100, 0.05);
+    transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.light [data-panel]:hover {
+    background: rgba(255, 255, 255, 0.82);
+    border-color: rgba(140, 160, 210, 0.45);
+    box-shadow: 0 8px 30px rgba(30, 50, 100, 0.08);
+    transform: translateY(-1px);
+}
+
+/* ── 5. Sidebar — frosted glass ── */
+/* Prototype: bg rgba(235,238,248,0.75), blur(16px), border-right rgba(160,175,210,0.30) */
+.light aside[aria-label="Panel navigation"] {
+    background: rgba(235, 238, 248, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right-color: rgba(160, 175, 210, 0.30);
+}
+
+/* Sidebar item hover — prototype: bg rgba(255,255,255,0.55), color #1a1d27 */
+.light aside[aria-label="Panel navigation"] [role="button"]:hover,
+.light aside[aria-label="Panel navigation"] button:hover {
+    background: rgba(255, 255, 255, 0.55);
+}
+
+/* Sidebar icons — prototype: opacity 0.55 */
+.light aside[aria-label="Panel navigation"] .text-muted-foreground {
+    opacity: 0.85;
+}
+
+/* ── 5b. CanvasTabs (vertical icon strip) — frosted glass ── */
+/* Prototype sidebar applies to both the sidebar and the nav strip.
+   CanvasTabs is targeted via: [data-app-shell] > .flex.flex-col.items-center */
+.light [data-app-shell] > .flex.flex-col.items-center {
+    background: rgba(235, 238, 248, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-right-color: rgba(160, 175, 210, 0.30);
+}
+
+/* CanvasTabs active tab — prototype: bg rgba(255,255,255,0.55), text #1a1d27,
+   border rgba(160,175,210,0.30) */
+.light [data-app-shell] [role="tablist"] [aria-selected="true"] {
+    background: rgba(255, 255, 255, 0.55);
+    color: #1a1d27;
+    border: 1px solid rgba(160, 175, 210, 0.30);
+}
+
+/* CanvasTabs tab hover — prototype: bg rgba(255,255,255,0.55), text #1a1d27 */
+.light [data-app-shell] [role="tablist"] button:hover {
+    background: rgba(255, 255, 255, 0.35);
+    color: #1a1d27;
+}
+
+/* CanvasTabs active indicator bar — match frost accent */
+.light [data-app-shell] [role="tablist"] [aria-selected="true"] .bg-primary {
+    background: rgba(74, 108, 247, 0.80);
+}
+
+/* CanvasTabs bottom buttons (chat, archive, settings, connection) — match sidebar glass */
+.light [data-app-shell] > .flex.flex-col.items-center button:hover {
+    background: rgba(255, 255, 255, 0.55);
+}
+
+/* ── 5c. Popover / dropdown — translucent glass ── */
+/* Prototype: bg rgba(255,255,255,0.85), blur(20px), border rgba(160,175,210,0.30),
+   shadow 0 8px 30px rgba(30,50,100,0.08), radius 8px */
+.light [data-radix-popper-content-wrapper] [role="dialog"],
+.light [data-radix-popper-content-wrapper] [role="listbox"],
+.light [data-radix-popper-content-wrapper] [role="menu"],
+.light [data-side] {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(160, 175, 210, 0.30);
+    box-shadow: 0 8px 30px rgba(30, 50, 100, 0.08);
+}
+
+/* ── 5d. Input fields — translucent glass ── */
+/* Prototype: bg rgba(255,255,255,0.55), blur(8px), border rgba(160,175,210,0.30),
+   focus: border rgba(74,108,247,0.40) + glow ring */
+.light input,
+.light textarea,
+.light select {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border-color: rgba(160, 175, 210, 0.30);
+}
+.light input:focus,
+.light textarea:focus,
+.light select:focus {
+    border-color: rgba(74, 108, 247, 0.40);
+    box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.10);
+    background: rgba(255, 255, 255, 0.70) !important;
+}
+.light input::placeholder,
+.light textarea::placeholder {
+    color: #8690a7;
+}
+
+/* ── 5e. Table header row — frost glass instead of opaque muted ── */
+/* Prototype: table headers are inside the card glass, no extra bg */
+.light [data-panel] thead tr {
+    background: rgba(240, 242, 250, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* ── 6. Scrollbar — indigo tinted ── */
+/* Prototype: rgba(74,108,247,0.12) → hover rgba(74,108,247,0.25) */
+.light ::-webkit-scrollbar-thumb {
+    background: rgba(74, 108, 247, 0.12);
+}
+.light ::-webkit-scrollbar-thumb:hover {
+    background: rgba(74, 108, 247, 0.25);
+}
+.light {
+    scrollbar-color: rgba(74, 108, 247, 0.12) transparent;
+}
+
+/* ── 7. Special — 毛玻璃交互细节 + 内容层样式 ── */
+
+/* 7a. Focus state — 蓝色光晕环 (prototype: focused card) */
+.light [data-panel]:focus-within {
+    border-color: rgba(74, 108, 247, 0.40);
+    box-shadow:
+        0 2px 12px rgba(30, 50, 100, 0.05),
+        0 0 20px rgba(74, 108, 247, 0.12);
+}
+
+/* 7b. Grid placeholder — 蓝色半透明 */
+.light .react-grid-placeholder {
+    background: rgba(74, 108, 247, 0.08) !important;
+    border: 1px dashed rgba(74, 108, 247, 0.25) !important;
+    border-radius: 14px;
+}
+
+/* 7c. 选中文本 — 蓝色高亮 */
+.light ::selection {
+    background: rgba(74, 108, 247, 0.18);
+    color: #1a1d27;
+}
+
+/* 7d. Popover / dropdown glass — blur layer
+   (translucent bg + border + shadow set in Section 5c above) */
+.light [data-radix-popper-content-wrapper] [role="dialog"],
+.light [data-radix-popper-content-wrapper] [role="listbox"],
+.light [data-radix-popper-content-wrapper] [role="menu"],
+.light [data-side] {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONTENT-LEVEL FINE-TUNING
+   ═══════════════════════════════════════════════════════════════ */
+
+/* 7e. Table — prototype: th 10px uppercase, td border-bottom divider,
+   hover row bg rgba(74,108,247,0.03) */
+.light [data-panel] th {
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: oklch(0.62 0.025 260);
+    border-bottom: 1px solid rgba(160, 175, 210, 0.30);
+    padding: 6px 10px;
+}
+.light [data-panel] td {
+    font-size: 0.8125rem;
+    color: oklch(0.18 0.015 260);
+    border-bottom: 1px solid rgba(160, 175, 210, 0.18);
+    padding: 8px 10px;
+}
+.light [data-panel] tr:last-child td {
+    border-bottom: none;
+}
+.light [data-panel] tr:hover td {
+    background: rgba(74, 108, 247, 0.03);
+}
+
+/* 7f. KV panel dividers — prototype: border-bottom frost-divider */
+.light [data-panel] .border-b {
+    border-bottom-color: rgba(160, 175, 210, 0.18);
+}
+
+/* 7g. Code block — prototype: bg rgba(240,242,250,0.6), blur(8px),
+   border divider, radius 8px */
+.light [data-panel] pre {
+    background: rgba(240, 242, 250, 0.6) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(160, 175, 210, 0.18);
+    border-radius: 8px;
+}
+
+/* 7h. Text / Markdown prose — prototype: 13px, line-height 1.7, fg-secondary */
+.light [data-panel] .prose {
+    --tw-prose-body: oklch(0.42 0.025 260);
+    --tw-prose-headings: oklch(0.18 0.015 260);
+    --tw-prose-links: oklch(0.55 0.20 265);
+    --tw-prose-code: oklch(0.55 0.20 265);
+    --tw-prose-hr: rgba(160, 175, 210, 0.18);
+    --tw-prose-quotes: oklch(0.62 0.025 260);
+    --tw-prose-quote-borders: rgba(74, 108, 247, 0.25);
+    --tw-prose-th-borders: rgba(160, 175, 210, 0.30);
+    --tw-prose-td-borders: rgba(160, 175, 210, 0.18);
+}
+
+/* 7i. Inline code in prose — frost-tinted background */
+.light [data-panel] :not(pre) > code {
+    background: rgba(74, 108, 247, 0.08);
+    color: oklch(0.55 0.20 265);
+    padding: 0.15em 0.35em;
+    border-radius: 4px;
+    font-size: 0.875em;
+}
+
+/* 7j. Chart colors — ensure Recharts picks up the frost palette */
+.light [data-panel] .recharts-cartesian-grid line {
+    stroke: rgba(160, 175, 210, 0.18);
+}
+.light [data-panel] .recharts-tooltip-wrapper .recharts-default-tooltip {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(160, 175, 210, 0.30) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 30px rgba(30, 50, 100, 0.08) !important;
+}

@@ -1,0 +1,412 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Blaze — 橙黑 烈焰
+   Class: .blaze
+   Style: 纯黑底色、锐利橙色强调、工业感、最大对比度、零废话
+
+   Prototype reference: output/prototype-blaze.html → Direction A "Pure Black"
+   Hex palette (from prototype):
+     bg       #000000     pure black background
+     canvas   #0a0a0a     canvas area
+     card     #1b1b1b     panel surface
+     card-hov #222222     panel hover
+     fg       #ffffff     primary foreground
+     fg-sec   #c0c0c0     secondary text
+     muted    #666666     labels, captions
+     border   #2a2a2a     borders
+     sidebar  #000000     sidebar background
+     accent   #ff9000     orange primary accent
+     dark-or  #cc7300     orange-dark
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font ── */
+/* 默认无衬线字体 — 不做覆盖 */
+
+/* ── 2. Color Variables — 纯黑 + 橙色工业色板 ── */
+.blaze {
+    /* bg #000000 — pure black */
+    --background: #000000;
+    /* fg #ffffff */
+    --foreground: #ffffff;
+
+    /* card #1b1b1b */
+    --card: #1b1b1b;
+    --card-foreground: #ffffff;
+
+    /* popover — between sidebar & card */
+    --popover: #141414;
+    --popover-foreground: #ffffff;
+
+    /* primary — #ff9000 orange accent */
+    --primary: #ff9000;
+    --primary-foreground: #000000;
+
+    /* secondary — slightly lighter than card */
+    --secondary: #222222;
+    --secondary-foreground: #e0e0e0;
+
+    /* muted bg — between bg and card */
+    --muted: #1a1a1a;
+    /* muted text — #666666 */
+    --muted-foreground: #777777;
+
+    /* accent bg */
+    --accent: #1e1e1e;
+    --accent-foreground: #ffffff;
+
+    --destructive: #f44336;
+
+    /* border — #2a2a2a solid dark border */
+    --border: #2a2a2a;
+    --input: #1b1b1b;
+    --ring: #ff9000;
+
+    /* 4px radius — sharp industrial */
+    --radius: 0.25rem;
+
+    /* charts — orange gradient series */
+    --chart-1: #ff9000;
+    --chart-2: #cc7300;
+    --chart-3: #ffb300;
+    --chart-4: rgba(255, 144, 0, 0.55);
+    --chart-5: #ff6600;
+
+    /* sidebar #000000 — pure black */
+    --sidebar: #000000;
+    --sidebar-foreground: #999999;
+    --sidebar-primary: #ff9000;
+    --sidebar-primary-foreground: #000000;
+    --sidebar-accent: #1a1a1a;
+    --sidebar-accent-foreground: #ffffff;
+    --sidebar-border: #2a2a2a;
+    --sidebar-ring: #ff9000;
+}
+
+/* ── 3. Canvas — 纯黑底色 ── */
+.blaze [data-app-shell] {
+    background: #0a0a0a;
+    position: relative;
+}
+
+/* 微弱噪点纹理 — 工业质感 */
+.blaze [data-app-shell]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            rgba(255, 255, 255, 0.006) 3px,
+            rgba(255, 255, 255, 0.006) 4px
+        );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── 4. Panel — 暗色卡片 + 锐利方角 + hover 时橙色顶线扫过 ── */
+.blaze [data-panel] {
+    background: #1b1b1b;
+    border: 1px solid #2a2a2a;
+    border-radius: 4px;
+    box-shadow: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 橙色顶线 — hover 从左向右扫过 (原型标志性交互) */
+.blaze [data-panel]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ff9000;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s cubic-bezier(0.5, 0, 0, 1);
+    z-index: 1;
+}
+.blaze [data-panel]:hover {
+    border-color: #3a3a3a;
+    background: #222222;
+}
+.blaze [data-panel]:hover::before {
+    transform: scaleX(1);
+}
+
+/* 面板标题栏 — 工业风粗线分隔 */
+.blaze [data-panel] [data-panel-header] {
+    border-bottom: 1px solid #2a2a2a;
+    padding: 12px 16px 10px;
+}
+
+/* ── 5. Sidebar — 纯黑 + 橙色活跃高亮 ── */
+.blaze aside[aria-label="Panel navigation"] {
+    background: #000000;
+    border-right: 1px solid #2a2a2a;
+}
+
+/* ── 5b. CanvasTabs bar ── */
+.blaze [data-canvas-tabs] {
+    background: #000000;
+    border-right-color: #2a2a2a;
+}
+
+/* ── 5c. CanvasTabs icon hover/active — 橙色高亮 ── */
+.blaze [data-canvas-tabs] button:not([aria-selected="true"]):hover {
+    color: #ff9000;
+    background: rgba(255, 144, 0, 0.06);
+}
+.blaze aside[aria-label="Panel navigation"] [role="button"]:hover {
+    background: rgba(255, 144, 0, 0.04);
+}
+.blaze [data-canvas-tabs] > div:last-child button:hover {
+    color: #ff9000;
+    background: rgba(255, 144, 0, 0.06);
+}
+
+/* ── 5d. Sidebar app name — 橙色调 ── */
+.blaze aside[aria-label="Panel navigation"] > div:first-child .font-semibold {
+    color: #ff9000;
+}
+
+/* ── 6. Scrollbar — 橙色调 ── */
+.blaze ::-webkit-scrollbar-thumb {
+    background: rgba(255, 144, 0, 0.15);
+    border-radius: 2px;
+}
+.blaze ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 144, 0, 0.30);
+}
+.blaze {
+    scrollbar-color: rgba(255, 144, 0, 0.15) transparent;
+}
+
+/* ── 7. Special — 工业风格内容样式 ── */
+
+/* --- 7a. 表格 — 工业数据表 + 橙色表头底线 --- */
+.blaze th {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 2px solid #ff9000;
+    text-transform: uppercase;
+    font-size: 1em;
+    letter-spacing: 0.08em;
+    color: #666666;
+}
+.blaze td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #c0c0c0;
+}
+.blaze tr:hover td {
+    background: rgba(255, 144, 0, 0.06);
+}
+
+/* --- 7b. 代码块 — 深黑底 + 暗边框 --- */
+.blaze pre,
+.blaze code {
+    background: #111111;
+    border: 1px solid #2a2a2a;
+    border-radius: 2px;
+    color: #c0c0c0;
+}
+
+/* --- 7c. KV 面板 — 完整样式覆盖 --- */
+.blaze [data-panel] .text-muted-foreground.shrink-0 {
+    color: #777777 !important;
+}
+.blaze [data-panel] .text-foreground {
+    color: #ffffff !important;
+}
+
+/* --- 7d. 占位符 — 橙色边框 --- */
+.blaze .react-grid-placeholder {
+    background: rgba(255, 144, 0, 0.08) !important;
+    border: 1px solid rgba(255, 144, 0, 0.20) !important;
+    border-radius: 4px;
+}
+
+/* --- 7e. 拖拽状态 — 橙色轮廓 --- */
+.blaze .react-grid-item.react-draggable-dragging [data-panel] {
+    border-color: rgba(255, 144, 0, 0.40) !important;
+    box-shadow: 0 0 0 1px rgba(255, 144, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.40) !important;
+}
+
+/* --- 7f. 选中文本 — 橙色高亮 --- */
+.blaze ::selection {
+    background: rgba(255, 144, 0, 0.20);
+    color: #ffffff;
+}
+
+/* --- 7g. 链接 --- */
+.blaze a:not([class]) {
+    color: #ff9000;
+}
+.blaze a:not([class]):hover {
+    color: #ffb300;
+}
+
+/* --- 7h. Prose / Markdown 变量 --- */
+.blaze {
+    --tw-prose-body: #c0c0c0;
+    --tw-prose-headings: #ffffff;
+    --tw-prose-lead: #c0c0c0;
+    --tw-prose-links: #ff9000;
+    --tw-prose-bold: #ffffff;
+    --tw-prose-counters: #666666;
+    --tw-prose-bullets: #666666;
+    --tw-prose-hr: rgba(255, 255, 255, 0.06);
+    --tw-prose-quotes: #c0c0c0;
+    --tw-prose-quote-borders: rgba(255, 144, 0, 0.35);
+    --tw-prose-captions: #666666;
+    --tw-prose-kbd: #ffffff;
+    --tw-prose-kbd-shadows: 0 0 0;
+    --tw-prose-code: #ff9000;
+    --tw-prose-pre-code: #c0c0c0;
+    --tw-prose-pre-bg: #111111;
+    --tw-prose-th-borders: rgba(255, 255, 255, 0.06);
+    --tw-prose-td-borders: rgba(255, 255, 255, 0.04);
+    --tw-prose-invert-body: #c0c0c0;
+    --tw-prose-invert-headings: #ffffff;
+    --tw-prose-invert-lead: #c0c0c0;
+    --tw-prose-invert-links: #ff9000;
+    --tw-prose-invert-bold: #ffffff;
+    --tw-prose-invert-counters: #666666;
+    --tw-prose-invert-bullets: #666666;
+    --tw-prose-invert-hr: rgba(255, 255, 255, 0.06);
+    --tw-prose-invert-quotes: #c0c0c0;
+    --tw-prose-invert-quote-borders: rgba(255, 144, 0, 0.35);
+    --tw-prose-invert-captions: #666666;
+    --tw-prose-invert-kbd: #ffffff;
+    --tw-prose-invert-kbd-shadows: 0 0 0;
+    --tw-prose-invert-code: #ff9000;
+    --tw-prose-invert-pre-code: #c0c0c0;
+    --tw-prose-invert-pre-bg: #111111;
+    --tw-prose-invert-th-borders: rgba(255, 255, 255, 0.06);
+    --tw-prose-invert-td-borders: rgba(255, 255, 255, 0.04);
+}
+
+/* --- 7i. 面板内文字颜色 — hex 覆盖确保 WebKit 可读 --- */
+.blaze [data-panel] h1,
+.blaze [data-panel] h2,
+.blaze [data-panel] h3,
+.blaze [data-panel] h4,
+.blaze [data-panel] h5,
+.blaze [data-panel] h6 {
+    color: #ffffff !important;
+}
+.blaze [data-panel] p {
+    color: #c0c0c0 !important;
+}
+.blaze [data-panel] li {
+    color: #c0c0c0 !important;
+}
+.blaze [data-panel] strong,
+.blaze [data-panel] b {
+    color: #ffffff !important;
+}
+.blaze [data-panel] a {
+    color: #ff9000 !important;
+}
+.blaze [data-panel] blockquote {
+    color: #c0c0c0 !important;
+    border-left-color: rgba(255, 144, 0, 0.35) !important;
+}
+.blaze [data-panel] :not(pre) > code {
+    color: #ff9000 !important;
+    background: rgba(255, 144, 0, 0.08) !important;
+}
+.blaze [data-panel] pre code {
+    color: #c0c0c0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* --- 7i-2. 面板底部渐变 — hex 修复 --- */
+.blaze [data-panel] > div > .absolute.bottom-0.pointer-events-none,
+.blaze [data-panel] .absolute.bottom-0.pointer-events-none {
+    background: linear-gradient(to top, #1b1b1b, transparent) !important;
+}
+
+/* --- 7j. 输入框 — 工业风格 --- */
+.blaze input,
+.blaze textarea {
+    background-color: #1b1b1b;
+    caret-color: #ff9000;
+    color: #ffffff;
+}
+.blaze input::placeholder,
+.blaze textarea::placeholder {
+    color: #666666;
+}
+
+/* --- 7k. Tooltip / popover / dropdown — 暗色弹层 --- */
+.blaze [data-popover-content],
+.blaze [role="tooltip"] {
+    background: #141414;
+    border-color: #2a2a2a;
+}
+
+/* --- 7l. 面板类型 Badge — 橙色标签 --- */
+.blaze [data-panel-header] .font-mono {
+    background: rgba(255, 144, 0, 0.1) !important;
+    color: #ff9000 !important;
+    border-radius: 2px;
+    letter-spacing: 0.06em;
+}
+
+/* --- 7m. 面板标题图标 — 橙色方块底色 + 黑色图标 (原型 logo-icon 风格) --- */
+/*    Prototype: logo-icon bg #ff9000, color #000, border-radius 4px.
+     Applied to the icon <span> wrapper in PanelShell header.             */
+.blaze [data-panel-header] > span:first-child {
+    background: #ff9000 !important;
+    color: #000000 !important;
+    border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+/* 图标 SVG 尺寸微调 — 确保在方块内居中美观 */
+.blaze [data-panel-header] > span:first-child svg {
+    width: 14px;
+    height: 14px;
+    color: #000000 !important;
+}
+
+/* --- 7m-2. 面板标题文字 — 纯白粗体 + 工业字排 --- */
+.blaze [data-panel-header] [role="heading"] {
+    color: #ffffff !important;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+
+/* --- 7n. 面板内容区 — 13px 正文 --- */
+.blaze [data-panel] > div:last-child {
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+/* --- 7o. CanvasTabs 按钮圆角 — 4px 工业风 --- */
+.blaze [data-canvas-tabs] button {
+    border-radius: 4px !important;
+}
+
+/* --- 7p. CanvasTabs active 状态 — 橙色背景填充 --- */
+.blaze [data-canvas-tabs] button[aria-selected="true"] {
+    background: rgba(255, 144, 0, 0.1) !important;
+    color: #ff9000 !important;
+}
+
+/* --- 7q. 面板内容区 padding — 匹配原型 --- */
+.blaze [data-panel] > div:last-child:not([data-panel-header]) {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 16px;
+}

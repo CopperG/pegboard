@@ -1,0 +1,575 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Doodle — 手绘速写本 (Sketchbook)
+   Class: .doodle
+   Direction A from prototype: 图钉装饰、手绘 SVG 虚线边框、nth-child 旋转、
+   Patrick Hand 手写体标题、Caveat 装饰字、荧光笔高亮、fractalNoise 纹理叠层
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font — 圆润手写风 + 装饰字体 (rounded body + handwritten accents) ──
+   正文: Quicksand (圆体)
+   面板标题/标签: Patrick Hand (手写体) — 铅笔/马克笔书写效果的关键
+   页面装饰: Caveat (速写装饰体)
+   代码: Fira Code
+   ────────────────────────────────────────────────────────────────── */
+.doodle {
+    font-family: 'Quicksand Variable', 'Quicksand', 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
+}
+
+/* ── 2. Color Variables — 彩色涂鸦色板 ──
+   Mapping from prototype spec table (Direction A: Sketchbook)
+   Hex references: bg=#2a2a35, card=rgba(50,50,64,0.85), primary=#ffe066, accent=#ff6b9d
+   Computed via sRGB→OKLab→OKLCH pipeline for precision
+   ──────────────────────────────────────────────────────── */
+.doodle {
+    /* bg=#2f2f40 — unified dark base per user spec */
+    --background: #2f2f40;
+    /* fg=#f0eee6 → oklch(0.95 0.011 95) */
+    --foreground: oklch(0.95 0.011 95);
+    /* card: thin white tint over background — panel ≈ bg + slight lightening */
+    --card: rgba(255,255,255,0.06);
+    --card-foreground: oklch(0.95 0.011 95);
+    /* popover: slightly lighter than card */
+    --popover: oklch(0.34 0.025 285);
+    --popover-foreground: oklch(0.95 0.011 95);
+    /* primary=#ffe066 → oklch(0.91 0.144 95) 荧光黄 neon yellow */
+    --primary: oklch(0.91 0.144 95);
+    --primary-foreground: oklch(0.20 0.02 285);
+    /* secondary: slightly brighter than bg */
+    --secondary: oklch(0.32 0.025 285);
+    --secondary-foreground: oklch(0.92 0.01 95);
+    /* muted: between bg and card */
+    --muted: oklch(0.30 0.02 285);
+    /* muted-fg=#9a97a8 → oklch(0.68 0.025 294) */
+    --muted-foreground: oklch(0.68 0.025 294);
+    /* accent=#ff6b9d → oklch(0.72 0.185 2) 荧光粉 neon pink */
+    --accent: oklch(0.72 0.185 2);
+    --accent-foreground: oklch(0.95 0.011 95);
+    --destructive: oklch(0.65 0.22 25);
+    /* border=rgba(240,238,230,0.15) → approximate oklch(0.95 0.011 95 / 15%) as solid: oklch(0.40 0.015 285) */
+    --border: oklch(0.40 0.015 285);
+    --input: oklch(0.34 0.02 285);
+    --ring: oklch(0.72 0.185 2);
+    /* chart-1=#ffe066 荧光黄 */
+    --chart-1: oklch(0.91 0.144 95);
+    /* chart-2=#ff6b9d 荧光粉 */
+    --chart-2: oklch(0.72 0.185 2);
+    /* chart-3=#66ffaa → oklch(0.90 0.177 156) 荧光绿 neon green */
+    --chart-3: oklch(0.90 0.177 156);
+    /* chart-4=#66d9ff → oklch(0.83 0.116 223) 荧光蓝 neon blue */
+    --chart-4: oklch(0.83 0.116 223);
+    /* chart-5=#ffaa44 → oklch(0.80 0.151 67) 荧光橙 neon orange */
+    --chart-5: oklch(0.80 0.151 67);
+    /* sidebar: slightly darker than bg */
+    --sidebar: #292939;
+    --sidebar-foreground: oklch(0.95 0.011 95);
+    --sidebar-primary: oklch(0.91 0.144 95);
+    --sidebar-primary-foreground: oklch(0.20 0.02 285);
+    --sidebar-accent: oklch(0.32 0.025 285);
+    --sidebar-accent-foreground: oklch(0.95 0.011 95);
+    --sidebar-border: oklch(0.34 0.02 285);
+    --sidebar-ring: oklch(0.72 0.185 2);
+
+    /* Doodle-specific custom properties for hand-written fonts */
+    --doodle-font-hand: 'Patrick Hand', 'PingFang SC', cursive;
+    --doodle-font-deco: 'Caveat Variable', 'Caveat', 'PingFang SC', cursive;
+    --doodle-font-mono: 'Fira Code Variable', 'Fira Code', monospace;
+}
+
+/* ── 3. Canvas — 深色速写本背景 (dark sketchbook page) ──
+   Prototype: radial color splashes on --sk-bg (#2a2a35)
+   + SVG fractalNoise pencil texture overlay via ::before
+   ─────────────────────────────────────────────────────── */
+.doodle [data-app-shell] {
+    background:
+        /* 微妙的彩色光斑 — 像颜料不小心滴到本子上 (prototype: rgba yellow 3%, pink 3%) */
+        radial-gradient(circle at 20% 80%, rgba(255,224,102,0.03) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255,107,157,0.03) 0%, transparent 50%),
+        var(--background);
+    position: relative;
+}
+
+/* Pencil texture overlay — SVG fractalNoise (prototype .sketch-canvas::before) */
+.doodle [data-app-shell]::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* ── 4. CanvasTabs — 速写本标签导航栏 ──
+   Prototype sidebar: bg=#252530, active: yellow border-left + yellow text + yellow bg
+   CanvasTabs is the icon-only strip; style to match prototype's dark sidebar feel
+   ──────────────────────────────────────────────────────────────────── */
+.doodle [data-canvas-tabs] {
+    background: var(--sidebar);
+    border-right: 1px solid rgba(240,238,230,0.15);
+}
+
+.doodle [data-canvas-tabs] [role="tab"][aria-selected="true"] {
+    background: rgba(255,224,102,0.15);
+    color: #ffe066;
+}
+
+.doodle [data-canvas-tabs] [role="tab"]:not([aria-selected="true"]):hover {
+    background: rgba(255,255,255,0.05);
+    color: #f0eee6;
+}
+
+/* ── 5. Panel — 便签纸/撕纸片风格 (sticky note / torn paper) ──
+   手绘摇晃边框 + 图钉装饰 + nth-child 随机旋转
+   ──────────────────────────────────────────────────────────── */
+
+/* SVG 手绘边框 — border-image with dashed stroke (prototype .sk-panel)
+   Prototype: background: var(--sk-card) = rgba(50,50,64,0.85)
+   border: 2px solid var(--sk-border) = rgba(240,238,230,0.15) */
+.doodle [data-panel] {
+    background: rgba(255,255,255,0.06) !important;
+    border: 2px solid rgba(240,238,230,0.15);
+    border-radius: 4px;
+    /* Wobbly hand-drawn border — SVG dashed stroke (prototype: 40x40, dasharray 3,2) */
+    border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect x='1' y='1' width='38' height='38' rx='2' fill='none' stroke='%23f0eee640' stroke-width='2' stroke-dasharray='3,2' stroke-linecap='round'/%3E%3C/svg%3E");
+    border-image-slice: 10;
+    border-image-width: 10px;
+    border-image-repeat: round;
+    border-width: 0;
+    border-style: solid;
+    outline: none;
+    /* 便签纸硬阴影 (prototype: 3px 3px 0 rgba(0,0,0,0.2)) */
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.2);
+    /* Bouncy transition (prototype: cubic-bezier(0.34, 1.56, 0.64, 1)) */
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: visible;
+}
+
+/* 图钉装饰 — 面板顶部的彩色圆点 (push-pin, centered, prototype: 18x18, top -8px)
+   Prototype uses flat single colors per nth-child, positioned at varying left % */
+.doodle [data-panel]::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffe066;  /* default: yellow */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* 鼠标悬停 — 回正 + 浮起 + 硬阴影加深 (prototype: rotate(0) scale(1.02) translateY(-4px)) */
+.doodle [data-panel]:hover {
+    transform: rotate(0deg) scale(1.02) translateY(-4px) !important;
+    box-shadow: 6px 8px 0 rgba(0,0,0,0.25);
+    z-index: 10;
+}
+
+/* nth-child 随机旋转 — 每张便签歪的角度不同，像随手贴上去的
+   Prototype: odd=-0.8deg, even=0.6deg, 3n=-1.2deg, 4n=1deg
+   NOTE: target .react-grid-item (the sibling wrapper) because [data-panel]
+   is always the sole child of its wrapper, making nth-child useless on it */
+.doodle .react-grid-item:nth-child(odd) [data-panel]  { transform: rotate(-0.8deg); }
+.doodle .react-grid-item:nth-child(even) [data-panel] { transform: rotate(0.6deg); }
+.doodle .react-grid-item:nth-child(3n) [data-panel]   { transform: rotate(-1.2deg); }
+.doodle .react-grid-item:nth-child(4n) [data-panel]   { transform: rotate(1deg); }
+
+/* 不同面板的图钉颜色 + 位置偏移 — 6色彩色图钉
+   Prototype: flat single colors, each at a different left % */
+.doodle .react-grid-item:nth-child(6n+1) [data-panel]::before {
+    background: #ffe066;  /* 黄色 */
+    left: 30%;
+}
+.doodle .react-grid-item:nth-child(6n+2) [data-panel]::before {
+    background: #ff6b9d;  /* 粉色 */
+    left: 60%;
+}
+.doodle .react-grid-item:nth-child(6n+3) [data-panel]::before {
+    background: #66ffaa;  /* 绿色 */
+    left: 45%;
+}
+.doodle .react-grid-item:nth-child(6n+4) [data-panel]::before {
+    background: #66d9ff;  /* 蓝色 */
+    left: 35%;
+}
+.doodle .react-grid-item:nth-child(6n+5) [data-panel]::before {
+    background: #ffaa44;  /* 橙色 */
+    left: 55%;
+}
+.doodle .react-grid-item:nth-child(6n+6) [data-panel]::before {
+    background: #c084fc;  /* 紫色 */
+    left: 40%;
+}
+
+/* ── Panel Type Badge — 面板右上角类型标签 (prototype: .sk-panel-badge) ──
+   Uses data-panel-type attribute + ::after pseudo-element
+   ──────────────────────────────────────────────────────────────────── */
+.doodle [data-panel][data-panel-type]::after {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-family: var(--doodle-font-hand);
+    background: rgba(255,224,102,0.15);
+    color: #ffe066;
+    z-index: 3;
+    pointer-events: none;
+    letter-spacing: 0.02em;
+}
+.doodle [data-panel-type="text"]::after     { content: "Text"; }
+.doodle [data-panel-type="table"]::after    { content: "Table"; }
+.doodle [data-panel-type="chart"]::after    { content: "Chart"; }
+.doodle [data-panel-type="code"]::after     { content: "Code"; }
+.doodle [data-panel-type="kv"]::after       { content: "KV"; }
+.doodle [data-panel-type="list"]::after     { content: "List"; }
+.doodle [data-panel-type="image"]::after    { content: "Image"; opacity: 0; transition: opacity 0.2s; }
+.doodle [data-panel-type="timeline"]::after { content: "Timeline"; }
+.doodle [data-panel-type="sandbox"]::after  { content: "HTML"; }
+.doodle [data-panel-type="image"]:hover::after { opacity: 1; }
+
+/* Hide the inline HTML badge — replaced by CSS ::after badge for all types */
+.doodle [data-panel-header] > span.font-mono {
+    display: none;
+}
+
+/* ── Panel Icon Highlight — 图标荧光笔高亮色块 (prototype: .highlight .hl-*) ──
+   Colors match push-pin per nth-child — like colored highlighter pen marking icons
+   ──────────────────────────────────────────────────────────────────── */
+.doodle [data-panel-header] > span[draggable] {
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+.doodle .react-grid-item:nth-child(6n+1) [data-panel-header] > span[draggable] {
+    color: #ffe066;
+    background: rgba(255,224,102,0.20);
+}
+.doodle .react-grid-item:nth-child(6n+2) [data-panel-header] > span[draggable] {
+    color: #ff6b9d;
+    background: rgba(255,107,157,0.20);
+}
+.doodle .react-grid-item:nth-child(6n+3) [data-panel-header] > span[draggable] {
+    color: #66ffaa;
+    background: rgba(102,255,170,0.20);
+}
+.doodle .react-grid-item:nth-child(6n+4) [data-panel-header] > span[draggable] {
+    color: #66d9ff;
+    background: rgba(102,217,255,0.20);
+}
+.doodle .react-grid-item:nth-child(6n+5) [data-panel-header] > span[draggable] {
+    color: #ffaa44;
+    background: rgba(255,170,68,0.20);
+}
+.doodle .react-grid-item:nth-child(6n+6) [data-panel-header] > span[draggable] {
+    color: #c084fc;
+    background: rgba(192,132,252,0.20);
+}
+
+/* ── 6. Sidebar — 速写本侧边栏 (sketch-pad sidebar) ──
+   Prototype: background: var(--sk-sidebar) = #252530
+   border-right: 1px solid var(--sk-border) = rgba(240,238,230,0.15)
+   ──────────────────────────────────────────────────── */
+.doodle aside[aria-label="Panel navigation"] {
+    background: var(--sidebar);
+    /* 右侧实线分割 (prototype: 1px solid var(--sk-border)) */
+    border-right: 1px solid rgba(240,238,230,0.15);
+}
+
+/* Sidebar app name — Caveat deco font + yellow (prototype: .sketch-sidebar-logo)
+   Targets the first-child div's span which holds the app name */
+.doodle aside[aria-label="Panel navigation"] > div:first-child {
+    border-bottom: 2px dashed rgba(240,238,230,0.15);
+}
+.doodle aside[aria-label="Panel navigation"] > div:first-child > span {
+    font-family: var(--doodle-font-deco);
+    color: #ffe066;
+    font-size: 18px;
+}
+
+/* Sidebar items — prototype: hover bg rgba(255,255,255,0.05), transform translateX(3px) */
+.doodle aside[aria-label="Panel navigation"] [role="button"]:hover,
+.doodle aside[aria-label="Panel navigation"] button:hover {
+    transform: translateX(3px);
+}
+
+/* Sidebar section labels — Patrick Hand font */
+.doodle aside[aria-label="Panel navigation"] .text-muted-foreground {
+    font-family: var(--doodle-font-hand);
+}
+
+/* CanvasTabs — overrides moved to section 4 above */
+
+/* ── 6. Scrollbar — 彩色荧光滚动条 (colorful neon scrollbar) ── */
+.doodle ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);  /* prototype: rgba(255,255,255,0.15) */
+    border-radius: 999px;
+}
+.doodle ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.3);   /* prototype: rgba(255,255,255,0.3) */
+}
+.doodle {
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+}
+
+/* ── 7. Special — 手绘文字质感 + 涂鸦装饰 ──
+   铅笔/马克笔书写效果：
+   - Patrick Hand 用于面板标题/标签 → 手写体质感 (关键！)
+   - Caveat 用于装饰标题 → 速写本大标题
+   - text-shadow 模拟笔触不均匀、铅笔粗糙感
+   - letter-spacing 微调模拟手写间距不规则
+   ──────────────────────────────────────────── */
+
+/* 全局文字 — 铅笔书写质感 (pencil stroke feel)
+   用多层 text-shadow 让文字边缘微微毛糙，不那么"电子化" */
+.doodle * {
+    text-shadow:
+        0.3px 0.3px 0px rgba(255,255,255,0.06),
+        -0.2px 0.1px 0px rgba(255,255,255,0.04);
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: auto;             /* 故意不用 antialiased，保留笔触感 */
+}
+
+/* 标题文字 — Caveat 装饰体 + 马克笔粗体效果 (marker pen heading)
+   Prototype: .sk-panel-title uses Patrick Hand, page titles use Caveat */
+.doodle h1, .doodle h2, .doodle h3 {
+    font-family: var(--doodle-font-deco);
+    text-shadow:
+        0.5px 0.5px 0px rgba(255,255,255,0.10),
+        -0.3px 0.2px 0px rgba(255,255,255,0.06),
+        0.1px -0.3px 0.5px rgba(255,224,102,0.08);  /* 微微的荧光黄反光 */
+    letter-spacing: 0.02em;
+    font-weight: 700;
+}
+
+/* 面板标题 — Patrick Hand 手写体 (prototype: .sk-panel-title uses --sk-font-hand)
+   这是手绘文字质感的关键：让面板标题看起来是铅笔/马克笔写的 */
+.doodle [data-panel] h3,
+.doodle [data-panel-header],
+.doodle [data-panel-header] h3,
+.doodle [data-panel-header] span {
+    font-family: var(--doodle-font-hand);
+    font-weight: 600;
+    font-size: 16px;
+    text-shadow:
+        0.5px 0.5px 0px rgba(255,255,255,0.08),
+        0 0 8px rgba(255,224,102,0.05);
+}
+
+/* 面板头部分割线 — 虚线 (prototype: border-bottom: 1px dashed var(--sk-border)) */
+.doodle [data-panel-header] {
+    border-bottom: 1px dashed rgba(240,238,230,0.15);
+    padding: 14px 16px 10px;
+}
+
+/* 段落文字 — 微妙的手写间距变化 */
+.doodle p, .doodle span, .doodle li {
+    letter-spacing: 0.01em;
+}
+
+/* 代码文字 — Fira Code, 铅笔写在格子本上的感觉
+   Prototype: .sk-code background: rgba(0,0,0,0.3), border: 1px dashed, padding: 14px 16px */
+.doodle code, .doodle pre {
+    font-family: var(--doodle-font-mono);
+    text-shadow:
+        0.4px 0.2px 0px rgba(102,255,170,0.08);  /* 绿色微光 */
+    letter-spacing: 0.02em;
+}
+
+/* 代码块 — 手绘虚线边框 (prototype: .sk-code) */
+.doodle [data-panel] pre,
+.doodle [data-panel] .code-block {
+    background: rgba(0,0,0,0.3);
+    border: 1px dashed rgba(240,238,230,0.15);
+    border-radius: 4px;
+    padding: 14px 16px;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* 荧光笔高亮选中效果 — 像用荧光笔划重点 */
+.doodle ::selection {
+    background: rgba(255,224,102,0.30);   /* 荧光黄选中 */
+    color: #f0eee6;
+    text-shadow: none;
+}
+
+/* 链接 — 手绘下划线 (wavy underline, prototype: underline-deco uses wavy pink) */
+.doodle a {
+    text-decoration-style: wavy;
+    text-decoration-color: rgba(255,107,157,0.50);
+    text-underline-offset: 4px;
+}
+
+/* 输入框 — 手绘风底线 */
+.doodle input, .doodle textarea {
+    border-style: dashed !important;
+    border-color: rgba(240,238,230,0.15) !important;
+}
+
+/* 按钮 — 手绘感 */
+.doodle button {
+    text-shadow:
+        0.3px 0.3px 0px rgba(255,255,255,0.05);
+}
+
+/* 拖拽状态 — 便签纸被拎起来抖动 (prototype: dragging state) */
+.doodle .react-grid-item.react-draggable-dragging [data-panel] {
+    transform: rotate(-1.5deg) scale(1.04) translateY(-6px) !important;
+    box-shadow: 8px 10px 0 rgba(0,0,0,0.30) !important;
+    z-index: 100 !important;
+    transition: none !important;
+}
+
+/* 占位符 — 虚线手绘方块 */
+.doodle .react-grid-placeholder {
+    background: rgba(255,224,102,0.08) !important;
+    border: 2px dashed rgba(255,224,102,0.30) !important;
+    border-radius: 4px;
+}
+
+/* ── Content-level styling — 表格 / KV / 列表 / Markdown ── */
+
+/* 表格 — 手绘风虚线边框 (prototype: Patrick Hand th, dashed borders, yellow th color) */
+.doodle table th {
+    font-family: var(--doodle-font-hand);
+    font-weight: 600;
+    font-size: 14px;
+    color: #ffe066;
+    border-bottom: 2px dashed rgba(255,224,102,0.3);
+    padding: 8px 10px;
+    text-align: left;
+}
+.doodle table td {
+    border-bottom: 1px dashed rgba(240,238,230,0.15);
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #f0eee6;
+}
+.doodle table tr:last-child td {
+    border-bottom: none;
+}
+.doodle table tr:hover td {
+    background: rgba(255,255,255,0.03);
+}
+.doodle table {
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+/* KV 面板 — 手写 key 标签 (prototype: .sk-kv-key uses Patrick Hand, dashed separator) */
+.doodle [data-panel] dl dt,
+.doodle [data-panel] .kv-key {
+    font-family: var(--doodle-font-hand);
+    font-size: 14px;
+    color: #9a97a8;
+}
+.doodle [data-panel] dl dd,
+.doodle [data-panel] .kv-value {
+    font-weight: 600;
+    color: #f0eee6;
+}
+.doodle [data-panel] dl div,
+.doodle [data-panel] .kv-row {
+    border-bottom: 1px dashed rgba(240,238,230,0.15);
+    padding: 8px 0;
+}
+.doodle [data-panel] dl div:last-child,
+.doodle [data-panel] .kv-row:last-child {
+    border-bottom: none;
+}
+
+/* 列表面板 — checkbox 手绘风 (prototype: .sk-list-checkbox) */
+.doodle [data-panel] input[type="checkbox"] {
+    border: 2px solid #9a97a8;
+    border-radius: 4px;
+}
+.doodle [data-panel] input[type="checkbox"]:checked {
+    background: #ffe066;
+    border-color: #ffe066;
+}
+
+/* Markdown prose 变量 — 与速写本配色一致 */
+.doodle .prose {
+    --tw-prose-body: #f0eee6;
+    --tw-prose-headings: #f0eee6;
+    --tw-prose-links: #66d9ff;
+    --tw-prose-bold: #f0eee6;
+    --tw-prose-code: #66ffaa;
+    --tw-prose-quotes: #9a97a8;
+    --tw-prose-quote-borders: rgba(255,224,102,0.3);
+    --tw-prose-counters: #9a97a8;
+    --tw-prose-bullets: #ffe066;
+    --tw-prose-hr: rgba(240,238,230,0.15);
+    --tw-prose-th-borders: rgba(255,224,102,0.3);
+    --tw-prose-td-borders: rgba(240,238,230,0.15);
+}
+
+/* Recharts 图表 — 保证文字可读 */
+.doodle .recharts-text {
+    font-family: var(--doodle-font-hand);
+    fill: #9a97a8;
+}
+.doodle .recharts-cartesian-axis-tick-value {
+    font-size: 12px;
+    fill: #9a97a8;
+}
+
+/* 面板内标签 — 荧光笔高亮色 (prototype: .sk-panel-badge, .tag-*) */
+.doodle [data-panel] .tag,
+.doodle [data-panel] .badge {
+    font-weight: 600;
+    font-size: 11px;
+    border-radius: 999px;
+    padding: 1px 8px;
+}
+
+/* ── Content text — !important hex 确保 WebKit 可读 ── */
+.doodle [data-panel] h1,
+.doodle [data-panel] h2,
+.doodle [data-panel] h3,
+.doodle [data-panel] h4,
+.doodle [data-panel] h5,
+.doodle [data-panel] h6 {
+    color: #f0eee6 !important;
+}
+.doodle [data-panel] p {
+    color: #e8e6de !important;
+}
+.doodle [data-panel] li {
+    color: #e8e6de !important;
+}
+.doodle [data-panel] strong,
+.doodle [data-panel] b {
+    color: #f0eee6 !important;
+}
+.doodle [data-panel] a {
+    color: #66d9ff !important;
+}
+.doodle [data-panel] blockquote {
+    color: #c0beb6 !important;
+    border-left-color: rgba(255,224,102,0.3) !important;
+}
+.doodle [data-panel] :not(pre) > code {
+    color: #66ffaa !important;
+    background: rgba(255,255,255,0.06) !important;
+}
+.doodle [data-panel] pre code {
+    color: #e0ddd4 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* 底部渐变 — hex 修复 oklch 解析问题 */
+.doodle [data-panel] .absolute.bottom-0.pointer-events-none {
+    background: linear-gradient(to top, #2f2f40, transparent) !important;
+}
+
+/* NOTE: Pixel noise overlay is rendered via Canvas API in App.tsx (NoiseOverlay component).
+   It activates when resolved theme === 'doodle'. This cannot be done in pure CSS.
+   The SVG fractalNoise ::before on [data-app-shell] provides additional pencil-paper texture. */

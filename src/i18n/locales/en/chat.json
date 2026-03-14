@@ -1,0 +1,19 @@
+{
+  "input_placeholder": "Type a message... Type @ to reference a panel",
+  "input_placeholder_compact": "Type a message...",
+  "input_placeholder_with_hint": "Type a message... (Enter to send, Shift+Enter for newline)",
+  "chat_title": "Chat",
+  "send": "Send",
+  "history": "Chat History",
+  "start_conversation": "Start a conversation...",
+  "no_matching_panels": "No matching panels",
+  "recording": "Recording",
+  "mic_not_supported": "Recording not supported",
+  "stop_recording": "Stop recording",
+  "start_recording": "Start recording",
+  "attach_file": "Attach file",
+  "plus_more": "+{{count}}",
+  "thinking": "Agent is thinking",
+  "collapse_chat": "Collapse chat",
+  "expand_chat": "Expand chat"
+}

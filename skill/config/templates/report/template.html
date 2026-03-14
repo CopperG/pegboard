@@ -1,0 +1,30 @@
+<div class="report">
+  <div class="report-header">
+    <h1 class="report-title">{{title}}</h1>
+    <span class="report-date">{{date}}</span>
+  </div>
+
+  <div class="report-table-wrapper">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <!-- {{#columns}} -->
+          <th>{{columnName}}</th>
+          <!-- {{/columns}} -->
+        </tr>
+      </thead>
+      <tbody>
+        <!-- {{#rows}} -->
+        <tr>
+          <td>{{cell}}</td>
+        </tr>
+        <!-- {{/rows}} -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="report-summary">
+    <h2 class="summary-title">摘要</h2>
+    <p class="summary-text">{{summary}}</p>
+  </div>
+</div>

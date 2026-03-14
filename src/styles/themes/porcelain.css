@@ -1,0 +1,145 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Porcelain — 瓷白极简
+   Class: .porcelain
+   Style: 温暖极简、纯白面板、极淡边框分隔、薰衣草紫主色
+   Inspiration: A2UI Composer Gallery — clean SaaS component gallery
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font ── */
+/* Default sans (Geist Variable) — no override, maximum clarity */
+
+/* ── 2. Color Variables — 近纯白 + 薰衣草紫主色 ── */
+.porcelain {
+    /* 背景：极浅暖白，比纯白略暖一点点 ~#F7F5F2 */
+    --background: oklch(0.97 0.004 75);
+    --foreground: oklch(0.20 0.01 260);
+
+    /* 卡片：纯白 */
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.20 0.01 260);
+
+    /* 弹层 */
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.20 0.01 260);
+
+    /* 主色：薰衣草紫 — 柔和专业 */
+    --primary: oklch(0.55 0.15 280);
+    --primary-foreground: oklch(0.98 0 0);
+
+    /* 次要色：极浅暖灰 */
+    --secondary: oklch(0.96 0.004 75);
+    --secondary-foreground: oklch(0.25 0.01 260);
+
+    /* 静音色 */
+    --muted: oklch(0.955 0.004 75);
+    --muted-foreground: oklch(0.55 0.01 260);
+
+    /* 强调色：极淡薰衣草 */
+    --accent: oklch(0.955 0.015 280);
+    --accent-foreground: oklch(0.25 0.01 260);
+
+    /* 危险色 */
+    --destructive: oklch(0.58 0.22 27);
+
+    /* 边框：淡暖灰 — 原型靠边框做分隔而非阴影 */
+    --border: oklch(0.92 0.004 75);
+    --input: oklch(0.95 0.004 75);
+    --ring: oklch(0.55 0.15 280);
+
+    /* 图表：柔和多彩色板 */
+    --chart-1: oklch(0.55 0.15 280);   /* 薰衣草紫 */
+    --chart-2: oklch(0.70 0.12 170);   /* 薄荷绿 */
+    --chart-3: oklch(0.68 0.14 40);    /* 暖珊瑚 */
+    --chart-4: oklch(0.65 0.12 250);   /* 天空蓝 */
+    --chart-5: oklch(0.78 0.12 90);    /* 柠檬黄 */
+
+    /* 侧栏：纯白 */
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.35 0.01 260);
+    --sidebar-primary: oklch(0.55 0.15 280);
+    --sidebar-primary-foreground: oklch(0.98 0 0);
+    --sidebar-accent: oklch(0.955 0.02 280);
+    --sidebar-accent-foreground: oklch(0.25 0.01 260);
+    --sidebar-border: oklch(0.93 0.004 75);
+    --sidebar-ring: oklch(0.55 0.15 280);
+
+    /* 圆角：12px，与原型匹配 */
+    --radius: 0.75rem;
+}
+
+/* ── 3. Canvas — 极浅暖白底色，无渐变无花纹 ── */
+.porcelain [data-app-shell] {
+    /* 纯净底色 — 原型就是一个干净的浅灰白平面 */
+    background: oklch(0.965 0.004 75);
+}
+
+/* ── 4. Panel — 纯白面板：靠边框分隔，极轻阴影 ── */
+.porcelain [data-panel] {
+    background: oklch(1 0 0);
+    /* 清晰的淡灰边框 — 原型的主要分隔手段 */
+    border: 1px solid oklch(0.91 0.004 75);
+    border-radius: 12px;
+    /* 极轻阴影：仅增加一丝纵深 */
+    box-shadow: 0 1px 3px oklch(0 0 0 / 2%);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.porcelain [data-panel]:hover {
+    border-color: oklch(0.88 0.006 75);
+    box-shadow: 0 2px 8px oklch(0 0 0 / 4%);
+}
+
+/* ── 5. Sidebar — 纯白底，右侧淡灰分割线 ── */
+.porcelain aside[aria-label="Panel navigation"] {
+    background: oklch(1 0 0);
+    border-right: 1px solid oklch(0.93 0.004 75);
+    box-shadow: none;
+}
+
+/* ── 6. Scrollbar — 暖灰色调，几乎隐形 ── */
+.porcelain ::-webkit-scrollbar-thumb {
+    background: oklch(0.50 0.01 260 / 10%);
+    border-radius: 9999px;
+}
+.porcelain ::-webkit-scrollbar-thumb:hover {
+    background: oklch(0.50 0.01 260 / 20%);
+}
+.porcelain {
+    scrollbar-color: oklch(0.50 0.01 260 / 10%) transparent;
+}
+
+/* ── 7. Special — 极简主义，仅必要细节 ── */
+
+/* 选中文本：薰衣草紫高亮 */
+.porcelain ::selection {
+    background: oklch(0.55 0.15 280 / 15%);
+    color: oklch(0.20 0.01 260);
+}
+
+/* 聚焦环：柔和薰衣草紫 */
+.porcelain [data-panel]:focus-within {
+    border-color: oklch(0.55 0.15 280 / 30%);
+    box-shadow:
+        0 1px 3px oklch(0 0 0 / 2%),
+        0 0 0 2px oklch(0.55 0.15 280 / 12%);
+}
+
+/* 占位符：淡紫色 */
+.porcelain .react-grid-placeholder {
+    background: oklch(0.55 0.15 280 / 6%) !important;
+    border: 1px dashed oklch(0.55 0.15 280 / 25%) !important;
+    border-radius: 12px;
+}
+
+/* 表格行 hover：极微妙紫色底色 */
+.porcelain tr:hover td {
+    background: oklch(0.55 0.15 280 / 3%);
+}
+
+/* 输入框聚焦 */
+.porcelain input:focus,
+.porcelain textarea:focus,
+.porcelain select:focus {
+    border-color: oklch(0.55 0.15 280 / 40%);
+    box-shadow: 0 0 0 2px oklch(0.55 0.15 280 / 8%);
+}

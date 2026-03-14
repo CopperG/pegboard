@@ -1,0 +1,9 @@
+{
+  "id": "pegboard",
+  "channels": ["lobster-pegboard"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  }
+}

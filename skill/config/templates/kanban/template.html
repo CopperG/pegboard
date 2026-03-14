@@ -1,0 +1,20 @@
+<div class="kanban">
+  <!-- Repeat this column block for each status -->
+  <div class="kanban-column">
+    <div class="column-header">
+      <span class="column-title">{{columnTitle}}</span>
+      <span class="column-count">{{count}}</span>
+    </div>
+    <div class="column-body">
+      <!-- Repeat this card block for each item -->
+      <div class="kanban-card">
+        <div class="card-title">{{cardTitle}}</div>
+        <div class="card-desc">{{cardDescription}}</div>
+        <div class="card-footer">
+          <span class="card-tag">{{tag}}</span>
+          <span class="card-avatar">{{assignee}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

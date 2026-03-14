@@ -1,0 +1,472 @@
+/* ════════════════════════════════════════════════════════════════════
+   Theme: Dark — Carbon 碳纤维质感
+   Class: .dark
+   Style: 近黑底色、碳纤维纹理、青色霓虹点缀、工业精密风格
+
+   Prototype reference: output/prototype-dark.html → #carbon section
+   Hex palette (from prototype):
+     bg       #0c0c0e     canvas/background
+     card     #151518     panel surface
+     sidebar  #111113     sidebar background
+     code-bg  #0e0e10     code block background
+     fg       #e4e4e8     primary foreground
+     body     #9b9baa     card body text
+     muted    #8b8b98     labels, captions, muted text (bumped from #6b6b78)
+     td       #b0b0bc     table cell text
+     accent   #06b6d4     cyan-500, primary accent
+     bright   #22d3ee     cyan-400, badge / highlight
+     chart-2  #0891b2     cyan-600
+     chart-4  #67e8f9     cyan-300
+     chart-5  #0ea5e9     sky-500
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Font ── */
+/* 默认无衬线字体 (Geist Variable) — 不做覆盖 */
+
+/* ── 2. Color Variables — 青色工业色板 ── */
+/*    oklch values calibrated to match prototype hex exactly.
+     Near-neutral darks use hue 286 (blue-violet tint in #0c0c0e etc.)
+     Accent cyan uses hue ~201 matching Tailwind cyan-500.
+
+     Verified conversions (python3 oklab math):
+       #0c0c0e → oklch(0.155 0.004 286)
+       #111113 → oklch(0.179 0.004 286)
+       #151518 → oklch(0.197 0.006 286)
+       #e4e4e8 → oklch(0.920 0.005 286)
+       #6b6b78 → oklch(0.532 0.020 286)
+       #9b9baa → oklch(0.694 0.022 286)
+       #b0b0bc → oklch(0.761 0.017 286)                               */
+.dark {
+    /* bg #0c0c0e */
+    --background: oklch(0.155 0.004 286);
+    /* fg #e4e4e8 */
+    --foreground: oklch(0.920 0.005 286);
+
+    /* card #151518 */
+    --card: oklch(0.197 0.006 286);
+    --card-foreground: oklch(0.920 0.005 286);
+
+    /* popover — between sidebar & card: ~#131316 */
+    --popover: oklch(0.188 0.005 286);
+    --popover-foreground: oklch(0.920 0.005 286);
+
+    /* primary — #06b6d4 cyan-500 → oklch(0.685 0.147 200.72) */
+    --primary: oklch(0.685 0.147 201);
+    --primary-foreground: oklch(0.155 0.004 286);
+
+    /* secondary — slightly lighter than card: ~#1c1c20 */
+    --secondary: oklch(0.215 0.006 286);
+    --secondary-foreground: oklch(0.900 0.005 286);
+
+    /* muted bg — ~#1a1a1e (between bg and card) */
+    --muted: oklch(0.185 0.005 286);
+    /* muted text — #8b8b98 (bumped from #6b6b78 for 4.5:1+ contrast on #151518) */
+    --muted-foreground: oklch(0.62 0.018 286);
+
+    /* accent bg — ~#1e1e22 */
+    --accent: oklch(0.210 0.006 286);
+    --accent-foreground: oklch(0.920 0.005 286);
+
+    --destructive: oklch(0.704 0.191 22.216);
+
+    /* border — cyan tinted at 15% opacity, matching prototype --border: rgba(6,182,212,0.15) */
+    --border: oklch(0.685 0.147 201 / 15%);
+    --input: oklch(0.197 0.006 286);
+    --ring: oklch(0.685 0.147 201);
+
+    /* 4px = 0.25rem — matches prototype card-radius */
+    --radius: 0.25rem;
+
+    /* charts — prototype: #06b6d4, #0891b2, #22d3ee, #67e8f9, #0ea5e9 */
+    --chart-1: oklch(0.685 0.147 201);
+    --chart-2: oklch(0.580 0.122 201);
+    --chart-3: oklch(0.789 0.130 196);
+    --chart-4: oklch(0.872 0.114 199);
+    --chart-5: oklch(0.655 0.155 220);
+
+    /* sidebar #111113 */
+    --sidebar: oklch(0.179 0.004 286);
+    --sidebar-foreground: oklch(0.920 0.005 286);
+    --sidebar-primary: oklch(0.685 0.147 201);
+    --sidebar-primary-foreground: oklch(0.155 0.004 286);
+    --sidebar-accent: oklch(0.185 0.005 286);
+    --sidebar-accent-foreground: oklch(0.920 0.005 286);
+    --sidebar-border: oklch(0.685 0.147 201 / 10%);
+    --sidebar-ring: oklch(0.685 0.147 201);
+}
+
+/* ── 3. Canvas — 碳纤维纹理 (solid near-black base) ── */
+.dark [data-app-shell] {
+    /* 纯色近黑底色 — 匹配原型 #0c0c0e */
+    background: #0c0c0e;
+    position: relative;
+}
+
+/* 水平扫描线层 (prototype ::before — repeating-linear-gradient 0deg) */
+.dark [data-app-shell]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.008) 2px,
+            rgba(255, 255, 255, 0.008) 4px
+        );
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 碳纤维交叉编织纹理叠加层 (prototype ::after — 45deg checkerboard) */
+.dark [data-app-shell]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    /* 45° 交叉编织图案：4px 棋盘格 */
+    background-image:
+        linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.01) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(255, 255, 255, 0.01) 75%
+        ),
+        linear-gradient(
+            45deg,
+            rgba(255, 255, 255, 0.01) 25%,
+            transparent 25%,
+            transparent 75%,
+            rgba(255, 255, 255, 0.01) 75%
+        );
+    background-size: 4px 4px;
+    background-position: 0 0, 2px 2px;
+    opacity: 0.5;
+}
+
+/* ── 4. Panel — 平面暗色 + 1px 中性亮边 + 无阴影 ── */
+/*    Prototype: background #151518, border rgba(255,255,255,0.06),
+     border-radius 4px, box-shadow none.                              */
+.dark [data-panel] {
+    background: #151518;
+    /* 中性白色极细边框 — 非青色调 */
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    /* 原型指定无阴影：flat surface */
+    box-shadow: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.dark [data-panel]:hover {
+    /* Hover 时边框转为青色: rgba(6,182,212,0.3) */
+    border-color: rgba(6, 182, 212, 0.3);
+    /* 仅 1px 青色轮廓线 — 无扩散光晕 */
+    box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.1);
+}
+
+/* 面板标题栏 — 无明显背景，保持碳纤维平面风格 */
+/*    Prototype: card padding 18px, no header bg, thin bottom separator.
+     Override PanelShell's Tailwind px-3 py-2 to match.                  */
+.dark [data-panel] [data-panel-header] {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 14px 18px 10px;
+}
+
+/* ── 5. Sidebar — 深色面板 + 精密细边框（无阴影） ── */
+/*    Prototype: background #111113, border-right rgba(6,182,212,0.08) */
+.dark aside[aria-label="Panel navigation"] {
+    background: #111113;
+    border-right: 1px solid rgba(6, 182, 212, 0.08);
+}
+
+/* ── 5b. CanvasTabs bar — 与 Sidebar 同调的深色背景 ── */
+/*    CanvasTabs is the leftmost vertical icon bar. Matches sidebar bg.
+     Uses data-canvas-tabs attribute for reliable targeting.             */
+.dark [data-canvas-tabs] {
+    background: #111113;
+    border-right-color: rgba(6, 182, 212, 0.08);
+}
+
+/* ── 5c. CanvasTabs icon hover/active — 青色高亮 ── */
+/*    Prototype sidebar nav-icon:
+       default: color var(--muted) = #6b6b78
+       hover:   bg rgba(6,182,212,0.06), color #22d3ee
+       active:  bg rgba(6,182,212,0.1),  color #06b6d4  (handled by bg-primary/15 + text-primary)
+     CanvasTabs maps 1:1 to prototype sidebar nav-icons.                */
+.dark [data-canvas-tabs] button:not([aria-selected="true"]):hover {
+    color: #22d3ee;
+    background: rgba(6, 182, 212, 0.06);
+}
+/* Sidebar panel-list: subtle cyan tint bg on hover (extends prototype spirit) */
+.dark aside[aria-label="Panel navigation"] [role="button"]:hover {
+    background: rgba(6, 182, 212, 0.04);
+}
+/* Bottom icon buttons in CanvasTabs (chat, archive, settings) also get cyan hover */
+.dark [data-canvas-tabs] > div:last-child button:hover {
+    color: #22d3ee;
+    background: rgba(6, 182, 212, 0.06);
+}
+
+/* ── 5d. Sidebar app name — 青色调 ── */
+/*    Prototype: logo bg rgba(6,182,212,0.08) color #22d3ee            */
+.dark aside[aria-label="Panel navigation"] > div:first-child .font-semibold {
+    color: #22d3ee;
+}
+
+/* ── 6. Scrollbar — 青色调 ── */
+/*    Prototype: rgba(6,182,212,0.15) thumb                            */
+.dark ::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.15);
+    border-radius: 2px;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.30);
+}
+.dark {
+    scrollbar-color: rgba(6, 182, 212, 0.15) transparent;
+}
+
+/* ── 7. Special — 碳纤维交叉编织纹理 + 内容样式 ── */
+
+/* --- 7a. 表格 — 精密工业数据表 --- */
+/*    Prototype: th color #6b6b78 (muted), border rgba(255,255,255,0.06)
+     td color #b0b0bc, td border rgba(255,255,255,0.04)
+     tr:hover cyan tint                                                  */
+.dark th {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    text-transform: uppercase;
+    font-size: 1em;
+    letter-spacing: 0.04em;
+    color: #e4e4e8;
+}
+.dark td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #b0b0bc;
+}
+.dark tr:hover td {
+    background: rgba(6, 182, 212, 0.04);
+}
+
+/* --- 7b. 代码块 — 深色底 + 白色极细边框 --- */
+/*    Prototype: bg #0e0e10, border rgba(255,255,255,0.05),
+     border-radius 2px, color #b0b0bc                                   */
+.dark pre,
+.dark code {
+    background: #0e0e10;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 2px;
+    color: #b0b0bc;
+}
+
+/* --- 7c. KV 面板 — 完整样式覆盖 --- */
+/*    Prototype: kv-key color muted, kv-val color fg bright,
+     kv-val font: JetBrains Mono 12px                                    */
+.dark [data-panel] .font-mono {
+    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'SF Mono', 'Menlo', monospace;
+}
+/* KV key labels — 确保可读 */
+.dark [data-panel] .text-muted-foreground.shrink-0 {
+    color: #9898a6 !important;
+}
+/* KV value text — 确保明亮 */
+.dark [data-panel] .text-foreground {
+    color: #e4e4e8 !important;
+}
+/* --- 7d. 占位符 — 青色边框 --- */
+.dark .react-grid-placeholder {
+    background: rgba(6, 182, 212, 0.08) !important;
+    border: 1px solid rgba(6, 182, 212, 0.20) !important;
+    border-radius: 4px;
+}
+
+/* --- 7e. 拖拽状态 — 青色轮廓 --- */
+.dark .react-grid-item.react-draggable-dragging [data-panel] {
+    border-color: rgba(6, 182, 212, 0.40) !important;
+    box-shadow: 0 0 0 1px rgba(6, 182, 212, 0.15), 0 4px 16px rgba(0, 0, 0, 0.40) !important;
+}
+
+/* --- 7f. 选中文本 — 青色高亮 --- */
+.dark ::selection {
+    background: rgba(6, 182, 212, 0.20);
+    color: #e4e4e8;
+}
+
+/* --- 7g. 链接 --- */
+.dark a:not([class]) {
+    color: #22d3ee;
+}
+.dark a:not([class]):hover {
+    color: #67e8f9;
+}
+
+/* --- 7h. Prose / Markdown 变量 --- */
+/*    Ensures readability in TextPanel's Markdown rendering.
+     Body text #a8a8b6, headings #e4e4e8, muted #8b8b98.                */
+.dark {
+    --tw-prose-body: #a8a8b6;
+    --tw-prose-headings: #e4e4e8;
+    --tw-prose-lead: #a8a8b6;
+    --tw-prose-links: #22d3ee;
+    --tw-prose-bold: #e4e4e8;
+    --tw-prose-counters: #8b8b98;
+    --tw-prose-bullets: #8b8b98;
+    --tw-prose-hr: rgba(255, 255, 255, 0.06);
+    --tw-prose-quotes: #bdbdc8;
+    --tw-prose-quote-borders: rgba(6, 182, 212, 0.25);
+    --tw-prose-captions: #8b8b98;
+    --tw-prose-kbd: #e4e4e8;
+    --tw-prose-kbd-shadows: 0 0 0;
+    --tw-prose-code: #22d3ee;
+    --tw-prose-pre-code: #b0b0bc;
+    --tw-prose-pre-bg: #0e0e10;
+    --tw-prose-th-borders: rgba(255, 255, 255, 0.06);
+    --tw-prose-td-borders: rgba(255, 255, 255, 0.04);
+    --tw-prose-invert-body: #9b9baa;
+    --tw-prose-invert-headings: #e4e4e8;
+    --tw-prose-invert-lead: #9b9baa;
+    --tw-prose-invert-links: #22d3ee;
+    --tw-prose-invert-bold: #e4e4e8;
+    --tw-prose-invert-counters: #8b8b98;
+    --tw-prose-invert-bullets: #8b8b98;
+    --tw-prose-invert-hr: rgba(255, 255, 255, 0.06);
+    --tw-prose-invert-quotes: #b0b0bc;
+    --tw-prose-invert-quote-borders: rgba(6, 182, 212, 0.25);
+    --tw-prose-invert-captions: #8b8b98;
+    --tw-prose-invert-kbd: #e4e4e8;
+    --tw-prose-invert-kbd-shadows: 0 0 0;
+    --tw-prose-invert-code: #22d3ee;
+    --tw-prose-invert-pre-code: #b0b0bc;
+    --tw-prose-invert-pre-bg: #0e0e10;
+    --tw-prose-invert-th-borders: rgba(255, 255, 255, 0.06);
+    --tw-prose-invert-td-borders: rgba(255, 255, 255, 0.04);
+}
+
+/* --- 7i. 面板内文字颜色 — 强制 hex 覆盖 --- */
+/*    Tailwind prose + oklch 变量链在 WebKit 中可能解析异常，
+     用高优先级 hex 直接覆盖确保可读性。                              */
+
+/* 标题: 高亮白色 */
+.dark [data-panel] h1,
+.dark [data-panel] h2,
+.dark [data-panel] h3,
+.dark [data-panel] h4,
+.dark [data-panel] h5,
+.dark [data-panel] h6 {
+    color: #e4e4e8 !important;
+}
+/* 正文段落 */
+.dark [data-panel] p {
+    color: #a8a8b6 !important;
+}
+/* 列表项 */
+.dark [data-panel] li {
+    color: #a8a8b6 !important;
+}
+/* 粗体 / 强调 */
+.dark [data-panel] strong,
+.dark [data-panel] b {
+    color: #e4e4e8 !important;
+}
+/* 链接 */
+.dark [data-panel] a {
+    color: #22d3ee !important;
+}
+/* 引用块 */
+.dark [data-panel] blockquote {
+    color: #bdbdc8 !important;
+    border-left-color: rgba(6, 182, 212, 0.25) !important;
+}
+/* 行内代码 */
+.dark [data-panel] :not(pre) > code {
+    color: #22d3ee !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+/* 代码块内文字 */
+.dark [data-panel] pre code {
+    color: #b0b0bc !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* --- 7i-2. 面板底部渐变 — 强制 hex 修复 --- */
+/*    inline style var(--card) 可能解析为 oklch 导致 WebKit 渐变异常,
+     用 CSS !important 覆盖 inline style 确保暗色渐变。               */
+.dark [data-panel] > div > .absolute.bottom-0.pointer-events-none,
+.dark [data-panel] .absolute.bottom-0.pointer-events-none {
+    background: linear-gradient(to top, #151518, transparent) !important;
+}
+
+/* --- 7j. 输入框 — 碳纤维风格 --- */
+/*    Background matches card surface, border consistent with theme.
+     Placeholder text uses muted color.                                  */
+.dark input,
+.dark textarea {
+    background-color: #151518;
+    caret-color: #06b6d4;
+    color: #e4e4e8;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: #8b8b98;
+}
+
+/* --- 7k. Tooltip / popover / dropdown — 暗色弹层 --- */
+/*    Ensures popovers, tooltips, and dropdowns have correct dark bg.    */
+.dark [data-popover-content],
+.dark [role="tooltip"] {
+    background: #131316;
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* --- 7l. 面板类型 Badge — 青色标签 --- */
+/*    Prototype: badge-bg rgba(6,182,212,0.1), badge-fg #22d3ee,
+     border-radius 2px, font-size 9px, uppercase, letter-spacing 0.08em.
+     PanelShell uses .font-mono for the HTML badge label.                  */
+.dark [data-panel-header] .font-mono {
+    background: rgba(6, 182, 212, 0.1) !important;
+    color: #22d3ee !important;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+}
+
+/* --- 7m. 面板标题 — 精密工业字排 --- */
+/*    Prototype: card-title 13px, font-weight 600, letter-spacing -0.01em
+     color #e4e4e8 (fg)                                                    */
+.dark [data-panel-header] [role="heading"] {
+    color: #e4e4e8;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* --- 7n. 面板内容区 — 13px 正文 --- */
+/*    Prototype: card-body 13px, line-height 1.65                         */
+.dark [data-panel] > div:last-child {
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+/* --- 7o. CanvasTabs 按钮圆角 — 4px 工业风 --- */
+/*    Prototype: nav-icon border-radius 4px (matches card-radius)         */
+.dark [data-canvas-tabs] button {
+    border-radius: 4px !important;
+}
+
+/* --- 7p. CanvasTabs active 状态 — 背景填充 --- */
+/*    Prototype: active-nav bg rgba(6,182,212,0.1), color #06b6d4
+     No left indicator bar — uses background fill instead.                */
+.dark [data-canvas-tabs] button[aria-selected="true"] {
+    background: rgba(6, 182, 212, 0.1) !important;
+    color: #06b6d4 !important;
+}
+
+/* --- 7q. 面板内容区 padding — 18px 匹配原型 --- */
+/*    PanelShell content: px-3 pb-3 (12px 12px) → override to 18px.       */
+.dark [data-panel] > div:last-child:not([data-panel-header]) {
+    padding-left: 18px;
+    padding-right: 18px;
+    padding-bottom: 18px;
+}

@@ -1,0 +1,5 @@
+{
+  "name": "dashboard-card",
+  "displayName": "仪表盘卡片",
+  "description": "数字指标展示，含趋势箭头和标签"
+}
