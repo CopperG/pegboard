@@ -135,16 +135,11 @@ The floating chat bar (`⌘J`) supports:
 
 5 built-in themes: **light**, **dark**, **vintage**, **doodle**, **blaze** — plus **system** (follows OS preference). Custom themes can be added at runtime.
 
-## Templates
+## More Features
 
-4 built-in layout templates for common use cases:
-
-- **Dashboard Card** — Summary cards layout
-- **Kanban** — Kanban board layout
-- **Report** — Report-style document layout
-- **Timeline Vertical** — Vertical timeline layout
-
-Templates can be imported, managed, and applied via the settings panel or agent tools.
+- **Panel interactions** — Tables support sorting/filtering, lists support checkboxes; drag panels onto tabs to categorize, drag to sidebar to pin/archive
+- **Chat multi-layout** — Full-screen, bottom bar, and floating window modes; file uploads support images/audio/documents (50 MB per file limit)
+- **Agent theme control** — New `theme_control` tool lets agents query/switch themes and register custom theme CSS via WebSocket
 
 ## License
 

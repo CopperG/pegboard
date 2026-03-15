@@ -8,7 +8,7 @@ import type {
 import type { LayoutMode, CanvasView } from '@/types/layout'
 import type { CanvasStateSnapshot, PanelSummary } from '@/types/websocket'
 import { BUILTIN_THEMES } from '@/hooks/useTheme'
-import { DEFAULT_GRID_CONFIG, CATEGORY_TAGS, CANVAS_VIEW_ORDER } from '@/types/layout'
+import { DEFAULT_GRID_CONFIG, CATEGORY_TAGS, CANVAS_VIEW_ORDER, normalizeTags } from '@/types/layout'
 import { applyJsonPatch, validatePatchSafety } from '@/lib/json-patch'
 import { validatePanelData } from '@/lib/panel-validators'
 import type { Operation } from 'fast-json-patch'
@@ -234,7 +234,7 @@ export const useCanvasStore = create<CanvasStore>()(
         updatedAt: now,
         focused: false,
         starred: message.starred ?? false,
-        tags: message.tags ?? [],
+        tags: normalizeTags(message.tags),
         interaction: message.interaction,
       }
 
@@ -410,7 +410,7 @@ export const useCanvasStore = create<CanvasStore>()(
       set((state) => {
         const panel = state.panels.find((p) => p.panelId === panelId)
         if (panel) {
-          panel.tags = tags
+          panel.tags = normalizeTags(tags)
           panel.updatedAt = new Date().toISOString()
         }
       })

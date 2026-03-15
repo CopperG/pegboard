@@ -1,4 +1,4 @@
-import { sendWsMessage } from '../lib/ws-helper.mjs'
+import { sendWsMessage } from './ws-helper.mjs'
 
 /**
  * Panel control tool - Create, update, archive, or delete panels on PegBoard canvas.

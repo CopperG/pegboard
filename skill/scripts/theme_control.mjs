@@ -1,4 +1,4 @@
-import { sendWsMessage, sendWsQuery } from '../lib/ws-helper.mjs'
+import { sendWsMessage, sendWsQuery } from './ws-helper.mjs'
 
 /**
  * Theme control tool - Query, switch, or register themes on PegBoard.

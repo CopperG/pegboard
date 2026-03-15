@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import {
   Pin, Star, Archive, Search, MoreHorizontal, X,
 } from 'lucide-react'
+import { setIframeLayerExpanded } from './SandboxRenderer'
 
 const actionItemClass =
   'flex w-full items-center gap-1.5 rounded-md px-1.5 py-1 text-sm select-none hover:bg-accent hover:text-accent-foreground transition-colors'
@@ -139,6 +140,13 @@ export function PanelShell({
     useCanvasStore.getState().archivePanel(panelId)
   }, [panelId])
 
+  // Bump iframe layer z-index above overlay when HTML panel is expanded
+  useEffect(() => {
+    if (expanded && isHtmlPanel) {
+      setIframeLayerExpanded(true)
+      return () => setIframeLayerExpanded(false)
+    }
+  }, [expanded, isHtmlPanel])
 
   return (
     <div
@@ -249,9 +257,9 @@ export function PanelShell({
             />
           </div>
 
-          {/* Content area */}
+          {/* Content area — hide HTML panel children when expanded to avoid dual SandboxRenderer */}
           <div className={`flex-1 px-3 pb-3 overflow-hidden ${isHtmlPanel ? 'min-h-0' : 'overflow-auto'}`}>
-            {children}
+            {!(expanded && isHtmlPanel) && children}
           </div>
         </>
       )}
@@ -261,6 +269,7 @@ export function PanelShell({
         expanded={expanded}
         title={title}
         panelIcon={panelIcon}
+        isHtmlPanel={isHtmlPanel}
         onClose={() => setExpanded(false)}
       >
         {children}
@@ -274,12 +283,14 @@ function ExpandOverlay({
   expanded,
   title,
   panelIcon,
+  isHtmlPanel,
   onClose,
   children,
 }: {
   expanded: boolean
   title: string
   panelIcon?: React.ReactNode
+  isHtmlPanel?: boolean
   onClose: () => void
   children: React.ReactNode
 }) {
@@ -312,12 +323,20 @@ function ExpandOverlay({
       {expanded && (
         <motion.div
           key="expand-backdrop"
+          data-no-swipe
           className="fixed inset-0 z-[100] flex items-center justify-center bg-panel-overlay/60"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
           onClick={onClose}
+          onMouseDown={(e) => e.stopPropagation()}
+          onMouseMove={(e) => e.stopPropagation()}
+          onMouseUp={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerMove={(e) => e.stopPropagation()}
+          onPointerUp={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
           <motion.div
             ref={overlayRef}
@@ -330,6 +349,8 @@ function ExpandOverlay({
             exit={{ scale: 0.8, opacity: 0 }}
             transition={springTransition}
             onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center px-6 py-4 border-b sticky top-0 bg-card z-10">
@@ -348,8 +369,8 @@ function ExpandOverlay({
                 <X className="w-5 h-5" />
               </button>
             </div>
-            {/* Content */}
-            <div className="p-6 flex-1 min-h-0 overflow-auto">{children}</div>
+            {/* Content — no padding for HTML panels so iframe fills the space */}
+            <div className={`flex-1 min-h-0 ${isHtmlPanel ? 'overflow-hidden' : 'p-6 overflow-auto'}`}>{children}</div>
           </motion.div>
         </motion.div>
       )}

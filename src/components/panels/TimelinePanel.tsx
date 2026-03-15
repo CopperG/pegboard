@@ -46,10 +46,8 @@ interface TimelineEvent {
 function isTimelinePanelData(data: unknown): data is TimelinePanelData {
   if (data == null || typeof data !== 'object') return false
   const obj = data as Record<string, unknown>
-  return (
-    Array.isArray(obj['events']) &&
-    typeof obj['viewMode'] === 'string'
-  )
+  // viewMode is optional here — component defaults to 'day'
+  return Array.isArray(obj['events'])
 }
 
 function toCalendarEvents(events: TimelineEvent[]): CalendarEvent[] {
@@ -244,8 +242,10 @@ function CalendarView({
 export function TimelinePanel({ panelId, data }: PanelProps) {
   const { t } = useTranslation('panels')
   const panelData = useMemo<TimelinePanelData | null>(() => {
-    if (isTimelinePanelData(data)) return data
-    return null
+    if (!isTimelinePanelData(data)) return null
+    // Normalise: default viewMode when agent omits it
+    if (!data.viewMode) return { ...data, viewMode: 'day' as const }
+    return data
   }, [data])
 
   const [activeView, setActiveView] = useState<ViewMode>(

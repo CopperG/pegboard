@@ -71,6 +71,12 @@ function getIframeLayer() {
   return iframeLayer
 }
 
+/** Bump iframe layer above fullscreen overlay (z-100) or restore */
+export function setIframeLayerExpanded(expanded: boolean) {
+  const layer = getIframeLayer()
+  layer.style.zIndex = expanded ? '101' : '1'
+}
+
 /** Clean up the persistent iframe layer and all cached iframes */
 export function cleanupIframeCache() {
   for (const [, entry] of iframeCache) {

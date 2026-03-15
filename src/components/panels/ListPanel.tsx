@@ -11,18 +11,24 @@ interface ListBadge {
   color: 'red' | 'green' | 'blue' | 'yellow' | 'gray'
 }
 
-interface ListItem {
+interface ListItemRaw {
   id: string
-  title: string
+  title?: string
+  text?: string           // agent compat: fallback for title
   subtitle?: string
   icon?: string
   badge?: ListBadge
+  checked?: boolean       // agent compat: initial checked state
   linkedPanel?: string
   metadata?: Record<string, unknown>
 }
 
+interface ListItem extends ListItemRaw {
+  title: string
+}
+
 interface ListPanelData {
-  items: ListItem[]
+  items: ListItemRaw[]
   emptyText?: string
 }
 
@@ -185,10 +191,28 @@ export function ListPanel({ panelId, data }: PanelProps) {
   )
   const checkable = interaction?.checkable ?? false
 
-  const panelData = useMemo<ListPanelData | null>(() => {
-    if (isListPanelData(data)) return data
-    return null
+  const panelData = useMemo<{ items: ListItem[]; emptyText?: string } | null>(() => {
+    if (!isListPanelData(data)) return null
+    // Normalise: accept "text" as fallback for "title"
+    const items: ListItem[] = data.items.map((item) => ({
+      ...item,
+      title: item.title || item.text || '',
+    }))
+    return { ...data, items }
   }, [data])
+
+  // Initialise checked state from data (agent may send checked: true)
+  const initialCheckedRef = useRef(false)
+  useEffect(() => {
+    if (panelData && !initialCheckedRef.current) {
+      initialCheckedRef.current = true
+      const ids = new Set<string>()
+      for (const item of (data as ListPanelData).items) {
+        if (item.checked) ids.add(item.id)
+      }
+      if (ids.size > 0) setCheckedIds(ids)
+    }
+  }, [panelData, data])
 
   const handleNavigate = useCallback((targetPanelId: string) => {
     useCanvasStore.getState().focusPanel(targetPanelId)

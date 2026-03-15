@@ -1,4 +1,4 @@
-import { sendWsQuery } from '../lib/ws-helper.mjs'
+import { sendWsQuery } from './ws-helper.mjs'
 
 /**
  * Canvas query tool - List panels or get panel details.

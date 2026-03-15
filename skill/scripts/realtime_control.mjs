@@ -1,4 +1,4 @@
-import { sendWsMessage } from '../lib/ws-helper.mjs'
+import { sendWsMessage } from './ws-helper.mjs'
 
 /**
  * Realtime control tool - Manage panel realtime data subscriptions.

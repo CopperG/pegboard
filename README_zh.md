@@ -135,16 +135,11 @@ cp -r channel-adapter/ <openclaw-plugins-dir>/pegboard
 
 5 套内置主题：**light**（浅色）、**dark**（深色）、**vintage**（复古）、**doodle**（涂鸦）、**blaze**（烈焰） —— 另有 **system**（跟随系统）。支持运行时添加自定义主题。
 
-## 模板
+## 更多特性
 
-4 套内置布局模板，覆盖常见使用场景：
-
-- **Dashboard Card** —— 摘要卡片布局
-- **Kanban** —— 看板布局
-- **Report** —— 报告文档布局
-- **Timeline Vertical** —— 纵向时间线布局
-
-可通过设置面板或 Agent 工具导入、管理和应用模板。
+- **面板交互增强** —— 表格支持排序/筛选，列表支持勾选；拖拽面板到标签页可分类，拖到侧边栏可置顶/归档
+- **聊天多布局** —— 全屏、底栏、浮动窗口三种模式；文件上传支持图片/音频/文档（单文件 50MB 限制）
+- **Agent 主题控制** —— 新增 `theme_control` 工具，Agent 可查询/切换主题，也可通过 WebSocket 注册自定义主题 CSS
 
 ## License
 

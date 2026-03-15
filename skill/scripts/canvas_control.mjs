@@ -1,4 +1,4 @@
-import { sendWsMessage } from '../lib/ws-helper.mjs'
+import { sendWsMessage } from './ws-helper.mjs'
 
 /**
  * Canvas control tool - Control canvas view: switch view mode, focus panel, expand panel, rearrange panels, clear canvas.

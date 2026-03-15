@@ -18,6 +18,22 @@ export const CATEGORY_TAGS: Record<Exclude<CanvasView, 'all'>, string> = {
   other: 'other',
 }
 
+/** Valid category tag values (excludes 'all' which is a view, not a tag) */
+const VALID_CATEGORY_SET = new Set(Object.values(CATEGORY_TAGS))
+
+/**
+ * Ensure tags always contain at least one valid category.
+ * If none of the provided tags is a recognized category, appends 'other'.
+ */
+export function normalizeTags(tags: string[] | undefined): string[] {
+  const result = tags?.length ? [...tags] : []
+  const hasValidCategory = result.some((t) => VALID_CATEGORY_SET.has(t))
+  if (!hasValidCategory) {
+    result.push('other')
+  }
+  return result
+}
+
 export type PanelSize = 'sm' | 'md' | 'lg' | 'full'
 
 /** Grid column mapping for panel sizes */
