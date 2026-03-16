@@ -86,7 +86,7 @@ function EditableInput({
       value={editValue}
       onChange={(e) => setEditValue(e.target.value)}
       onKeyDown={(e) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.nativeEvent.keyCode !== 229) {
           e.preventDefault()
           handleSubmit()
         }

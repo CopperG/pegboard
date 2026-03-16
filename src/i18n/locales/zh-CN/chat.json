@@ -1,18 +1,14 @@
 {
   "input_placeholder": "输入消息... 输入 @ 引用面板",
-  "input_placeholder_compact": "输入消息...",
-  "input_placeholder_with_hint": "输入消息... (Enter 发送, Shift+Enter 换行)",
   "chat_title": "对话",
   "send": "发送",
   "history": "对话历史",
   "start_conversation": "开始对话...",
   "no_matching_panels": "没有匹配的面板",
-  "recording": "录音中",
   "mic_not_supported": "不支持录音",
   "stop_recording": "停止录音",
   "start_recording": "开始录音",
   "attach_file": "添加附件",
-  "plus_more": "+{{count}}",
   "thinking": "Agent 正在思考",
   "collapse_chat": "收起聊天",
   "expand_chat": "展开聊天"

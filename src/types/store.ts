@@ -78,7 +78,6 @@ export interface CanvasStore {
   patchPanel: (panelId: string, patch: JsonPatchOperation[]) => void
   archivePanel: (panelId: string) => void
   restorePanel: (panelId: string) => void
-  deletePanel: (panelId: string) => void
   deleteArchivedPanel: (panelId: string) => void
   pinPanel: (panelId: string) => void
   unpinPanel: (panelId: string) => void
@@ -88,7 +87,6 @@ export interface CanvasStore {
   resizePanel: (panelId: string, w: number, h: number) => void
   changePanelType: (panelId: string, newType: string, newData?: unknown, newTitle?: string, newSubtitle?: string) => void
   applyAgentLayout: (layout: { panelId: string; x: number; y: number; w: number; h: number }[]) => void
-  switchLayout: (layout: LayoutMode) => void
   switchView: (view: CanvasView) => void
   navigateView: (direction: 'prev' | 'next') => boolean
   focusPanel: (panelId: string) => void

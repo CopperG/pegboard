@@ -5,7 +5,7 @@ export type Theme = 'light' | 'dark' | 'vintage' | 'doodle' | 'blaze' | 'system'
 export const BUILTIN_THEMES = ['light', 'dark', 'vintage', 'doodle', 'blaze'] as const
 
 /** Get all theme CSS class names (built-in + custom). */
-export function getAllThemeClasses(): string[] {
+function getAllThemeClasses(): string[] {
   const custom: string[] = JSON.parse(localStorage.getItem('pegboard-custom-themes') || '[]')
   return [...BUILTIN_THEMES, ...custom]
 }

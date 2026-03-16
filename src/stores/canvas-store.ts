@@ -347,16 +347,6 @@ export const useCanvasStore = create<CanvasStore>()(
       })
     },
 
-    deletePanel: (panelId: string) => {
-      set((state) => {
-        const idx = state.panels.findIndex((p) => p.panelId === panelId)
-        if (idx !== -1) {
-          state.panels.splice(idx, 1)
-          delete state.panelLayouts[panelId]
-        }
-      })
-    },
-
     deleteArchivedPanel: (panelId: string) => {
       set((state) => {
         const idx = state.archivedPanels.findIndex(
@@ -461,12 +451,6 @@ export const useCanvasStore = create<CanvasStore>()(
             h: Math.max(1, Math.min(18, item.h)),
           }
         }
-      })
-    },
-
-    switchLayout: (layout: LayoutMode) => {
-      set((state) => {
-        state.activeLayout = layout
       })
     },
 
@@ -639,9 +623,6 @@ export const useCanvasStore = create<CanvasStore>()(
 
 // ── Memoized Selectors ──────────────────────────────────────────────
 // Use these instead of inline selectors to avoid unnecessary re-renders.
-
-export const selectPanelById = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
-  s.panels.find((p) => p.panelId === panelId)
 
 export const selectPanelStarred = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
   s.panels.find((p) => p.panelId === panelId)?.starred ?? false

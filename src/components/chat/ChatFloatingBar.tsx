@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo, type RefCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { invoke } from '@tauri-apps/api/core'
 import { useChatStore } from '@/stores/chat-store'
@@ -51,6 +51,28 @@ export function ChatFloatingBar({ open, onClose }: { open: boolean; onClose: () 
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // IME composing state (for CJK input methods)
+  // Use a ref callback so listeners attach the moment the <input> mounts,
+  // even if the component initially renders null (open=false).
+  const composingRef = useRef(false)
+  const prevInputEl = useRef<HTMLInputElement | null>(null)
+  const inputIMERef: RefCallback<HTMLInputElement> = useCallback((el) => {
+    // Clean up previous element
+    if (prevInputEl.current && prevInputEl.current !== el) {
+      prevInputEl.current.removeEventListener('compositionstart', onIMEStart)
+      prevInputEl.current.removeEventListener('compositionend', onIMEEnd)
+    }
+    prevInputEl.current = el
+    inputRef.current = el
+    if (el) {
+      el.addEventListener('compositionstart', onIMEStart)
+      el.addEventListener('compositionend', onIMEEnd)
+    }
+
+    function onIMEStart() { composingRef.current = true }
+    function onIMEEnd() { setTimeout(() => { composingRef.current = false }) }
+  }, [])
 
   // @ autocomplete state
   const [autocompleteOpen, setAutocompleteOpen] = useState(false)
@@ -257,7 +279,7 @@ export function ChatFloatingBar({ open, onClose }: { open: boolean; onClose: () 
           )
           return
         }
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && e.nativeEvent.keyCode !== 229) {
           e.preventDefault()
           const selected = filteredPanels[autocompleteIndex]
           if (selected) {
@@ -272,7 +294,7 @@ export function ChatFloatingBar({ open, onClose }: { open: boolean; onClose: () 
         }
       }
 
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter' && !e.shiftKey && e.nativeEvent.keyCode !== 229) {
         e.preventDefault()
         void sendMessage()
       }
@@ -507,7 +529,7 @@ export function ChatFloatingBar({ open, onClose }: { open: boolean; onClose: () 
               nativeButton={false}
             >
               <input
-                ref={inputRef}
+                ref={inputIMERef}
                 type="text"
                 value={value}
                 onChange={handleInputChange}

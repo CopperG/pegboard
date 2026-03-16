@@ -1,5 +1,4 @@
 {
-  "confirm": "Confirm",
   "cancel": "Cancel",
   "save": "Save",
   "delete": "Delete",
@@ -17,13 +16,6 @@
   "collapse": "Collapse",
   "fullscreen": "Fullscreen",
   "exit_fullscreen": "Exit fullscreen",
-  "import": "Import",
-  "export": "Export",
-  "select_all": "Select all",
-  "deselect_all": "Deselect all",
-  "completed_count": "Done {{done}}/{{total}}",
-  "clear_filter": "Clear filter",
-  "clear_all_filters": "Clear all filters",
   "filter": "Filter",
   "sort": "Sort",
   "send": "Send",
@@ -36,11 +28,5 @@
   "mic_permission_denied": "Microphone permission denied",
   "mic_not_found": "No microphone device found",
   "recording_failed": "Recording failed: {{error}}",
-  "image_preview": "Image preview",
-  "close_preview": "Close preview",
-  "panel_actions": "Panel actions",
-  "remove_attachment": "Remove attachment",
-  "add_attachment": "Add attachment",
-  "send_message": "Send message",
-  "panel_navigation": "Panel navigation"
+  "panel_actions": "Panel actions"
 }

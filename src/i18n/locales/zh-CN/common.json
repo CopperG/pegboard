@@ -1,5 +1,4 @@
 {
-  "confirm": "确认",
   "cancel": "取消",
   "save": "保存",
   "delete": "删除",
@@ -17,13 +16,6 @@
   "collapse": "收起",
   "fullscreen": "全屏",
   "exit_fullscreen": "退出全屏",
-  "import": "导入",
-  "export": "导出",
-  "select_all": "全选",
-  "deselect_all": "取消全选",
-  "completed_count": "已完成 {{done}}/{{total}}",
-  "clear_filter": "清除筛选",
-  "clear_all_filters": "清除所有筛选",
   "filter": "筛选",
   "sort": "排序",
   "send": "发送",
@@ -36,11 +28,5 @@
   "mic_permission_denied": "麦克风权限被拒绝",
   "mic_not_found": "未找到麦克风设备",
   "recording_failed": "录音失败: {{error}}",
-  "image_preview": "图片预览",
-  "close_preview": "关闭预览",
-  "panel_actions": "面板操作",
-  "remove_attachment": "移除附件",
-  "add_attachment": "添加附件",
-  "send_message": "发送消息",
-  "panel_navigation": "面板导航"
+  "panel_actions": "面板操作"
 }
