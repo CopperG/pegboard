@@ -5,17 +5,17 @@ use crate::ws_server::WsState;
 use crate::{CanvasState, PanelsDataCache};
 
 #[tauri::command]
-pub fn send_ws_message(message: String, ws_state: State<'_, Arc<WsState>>) -> Result<(), String> {
-    ws_state
-        .tx
-        .send(message)
-        .map_err(|e| format!("Failed to send WS message: {}", e))?;
+pub async fn send_ws_message(message: String, ws_state: State<'_, Arc<WsState>>) -> Result<(), String> {
+    let delivered = ws_state.send_to_all(&message).await;
+    if delivered == 0 {
+        return Err("No connected WS clients".to_string());
+    }
     Ok(())
 }
 
 #[tauri::command]
 pub async fn get_ws_status(ws_state: State<'_, Arc<WsState>>) -> Result<String, String> {
-    let count = ws_state.tx.receiver_count();
+    let count = ws_state.client_count().await;
     let last_at = *ws_state.last_connected_at.read().await;
     let total = ws_state.total_connections.load(std::sync::atomic::Ordering::Relaxed);
 
