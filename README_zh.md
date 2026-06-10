@@ -114,8 +114,9 @@ node claude-bridge/index.mjs
 ./claude-bridge/install-launchd.sh
 ```
 
-桥接器维持一个长驻 claude 进程（流式 JSON 输入输出），把每条聊天消息作为
-一轮对话转发，并把回复流式回传聊天栏。面板操作由 Claude Code 通过 skill
+桥接器需要 **Node >= 22**（依赖全局 `WebSocket`）。它维持一个长驻 claude
+进程（流式 JSON 输入输出），把每条聊天消息作为一轮对话转发，并把回复流式
+回传聊天栏。面板操作由 Claude Code 通过 skill
 脚本直接完成。会话在 24 小时内可跨桥接器重启延续。
 
 **不要同时运行桥接器和 OpenClaw channel 插件** —— 两者消费同样的聊天消息，

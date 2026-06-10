@@ -114,9 +114,9 @@ node claude-bridge/index.mjs
 ./claude-bridge/install-launchd.sh
 ```
 
-The bridge keeps one persistent `claude` process alive (streaming JSON in/out),
-forwards each chat message as a turn, and streams the reply back to the chat
-bar. Panel tool calls are made by Claude Code itself through the skill scripts.
+The bridge requires **Node >= 22** (it uses the global `WebSocket`). It keeps
+one persistent `claude` process alive (streaming JSON in/out), forwards each
+chat message as a turn, and streams the reply back to the chat bar. Panel tool calls are made by Claude Code itself through the skill scripts.
 Sessions survive bridge restarts within 24 hours.
 
 **Do not run the bridge and the OpenClaw channel plugin at the same time** —

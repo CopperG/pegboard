@@ -145,9 +145,6 @@ function finishTurn() {
 }
 
 function runTurn(userMsg) {
-  if (!child) spawnClaude()
-  if (!child) { queue.done(); return }
-
   const messageId = crypto.randomUUID()
   resetTurn(parserState)
 
@@ -162,18 +159,30 @@ function runTurn(userMsg) {
     child?.kill('SIGKILL')
   }, TURN_TIMEOUT_MS)
 
+  // Establish turn + emit stream_start BEFORE the risky spawn/write, so any
+  // failure path still surfaces an error chunk + stream_end (never a silent
+  // "sent, no reply"). finishTurn() is idempotent, so a later child 'close'
+  // after a caught failure is a no-op.
   turn = { messageId, buffer, timer }
-
   sendWs({ type: 'stream_start', messageId, timestamp: new Date().toISOString() })
 
-  const prompt = buildPrompt(userMsg)
-  log(`turn start (messageId=${messageId}, prompt=${prompt.length} chars)`)
-  child.stdin.write(
-    JSON.stringify({
-      type: 'user',
-      message: { role: 'user', content: [{ type: 'text', text: prompt }] },
-    }) + '\n',
-  )
+  try {
+    if (!child) spawnClaude()
+    if (!child) throw new Error('claude 进程未能启动')
+
+    const prompt = buildPrompt(userMsg)
+    log(`turn start (messageId=${messageId}, prompt=${prompt.length} chars)`)
+    child.stdin.write(
+      JSON.stringify({
+        type: 'user',
+        message: { role: 'user', content: [{ type: 'text', text: prompt }] },
+      }) + '\n',
+    )
+  } catch (err) {
+    log(`runTurn failed: ${String(err)}`)
+    sendWs({ type: 'stream_chunk', messageId, content: `无法处理消息：${String(err)}` })
+    finishTurn()
+  }
 }
 
 function processNext() {
@@ -217,6 +226,13 @@ async function connectLoop() {
     log(`disconnected, retrying in ${delay}ms`)
     await new Promise((r) => setTimeout(r, delay))
   }
+}
+
+// Requires the global WebSocket (stable, unflagged on Node >= 22). Fail loud
+// with a clear message instead of a bare "WebSocket is not defined" on Node 18/20.
+if (typeof WebSocket === 'undefined') {
+  console.error('[claude-bridge] 需要 Node >= 22（依赖全局 WebSocket）。当前: ' + process.version)
+  process.exit(1)
 }
 
 sessionId = await loadSession()
