@@ -127,7 +127,8 @@ Configuration (env vars):
 | Variable | Default | Purpose |
 |----------|---------|---------|
 | `PEGBOARD_CLAUDE_BIN` | `claude` | Claude Code binary |
-| `PEGBOARD_CLAUDE_FLAGS` | scoped skill allowlist | Extra CLI flags. Note: a `Bash(node:*)` allowlist permits arbitrary node code; narrow it if you need a tighter sandbox |
+| `PEGBOARD_CLAUDE_ALLOWED_TOOLS` | `Skill(pegboard),Bash(node <skills>/pegboard/scripts/*),Read` | `--allowedTools` value, passed as one argument. The default is scoped to the skill scripts; widen to `Bash(node:*)` (permits arbitrary node code) only if you need it |
+| `PEGBOARD_CLAUDE_FLAGS` | (empty) | Extra misc CLI flags, space-separated (do not put `--allowedTools` here) |
 | `PEGBOARD_CLAUDE_CWD` | `$HOME` | Working directory for the agent |
 | `PEGBOARD_CLAUDE_TIMEOUT_MS` | `600000` | Per-turn timeout |
 

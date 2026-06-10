@@ -27,11 +27,15 @@ import { createChunkBuffer } from './chunk-buffer.mjs'
 const CLAUDE_BIN = process.env.PEGBOARD_CLAUDE_BIN || 'claude'
 const CLAUDE_CWD = process.env.PEGBOARD_CLAUDE_CWD || homedir()
 const TURN_TIMEOUT_MS = Number(process.env.PEGBOARD_CLAUDE_TIMEOUT_MS) || 600_000
-// DEFAULT_FLAGS: Task 0 spike 实测最窄可用 allowlist。窄 glob 形式
-// `Bash(node <绝对脚本目录>/*)` 实测可用（前缀形式 `node <dir>/:*` 被拦截）。
+// allowlist: Task 0 spike 实测最窄可用形式。窄 glob `Bash(node <绝对脚本目录>/*)`
+// 实测可用（前缀形式 `node <dir>/:*` 被拦截）。
+// 注意：该规则内部含空格（"node " + 路径），必须作为【单个 argv 元素】传给
+// --allowedTools，绝不能按空格 split——否则规则被切碎、node 脚本不被授权。
 const SKILL_SCRIPTS_DIR = join(homedir(), '.claude', 'skills', 'pegboard', 'scripts')
-const DEFAULT_FLAGS = `--allowedTools Skill(pegboard),Bash(node ${SKILL_SCRIPTS_DIR}/*),Read`
-const EXTRA_FLAGS = (process.env.PEGBOARD_CLAUDE_FLAGS || DEFAULT_FLAGS).split(' ').filter(Boolean)
+const DEFAULT_ALLOWED_TOOLS = `Skill(pegboard),Bash(node ${SKILL_SCRIPTS_DIR}/*),Read`
+const ALLOWED_TOOLS = process.env.PEGBOARD_CLAUDE_ALLOWED_TOOLS || DEFAULT_ALLOWED_TOOLS
+// 其余杂项 flags（不含 allowlist）可按空格 split。
+const EXTRA_FLAGS = (process.env.PEGBOARD_CLAUDE_FLAGS || '').split(' ').filter(Boolean)
 
 const RECONNECT_BASE_MS = 1000
 const RECONNECT_MAX_MS = 30000
@@ -80,6 +84,8 @@ function spawnClaude() {
     '--output-format', 'stream-json',
     '--include-partial-messages',
     '--verbose',
+    // allowlist value kept as ONE element — it contains a space ("node <path>")
+    '--allowedTools', ALLOWED_TOOLS,
     ...(sessionId ? ['--resume', sessionId] : []),
     ...EXTRA_FLAGS,
   ]

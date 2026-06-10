@@ -126,7 +126,8 @@ node claude-bridge/index.mjs
 | 变量 | 默认值 | 用途 |
 |------|--------|------|
 | `PEGBOARD_CLAUDE_BIN` | `claude` | Claude Code 可执行文件 |
-| `PEGBOARD_CLAUDE_FLAGS` | 限定到 skill 脚本的 allowlist | 额外 CLI 参数。注意 `Bash(node:*)` 允许任意 node 代码，需要更紧沙箱请收窄 |
+| `PEGBOARD_CLAUDE_ALLOWED_TOOLS` | `Skill(pegboard),Bash(node <skills>/pegboard/scripts/*),Read` | `--allowedTools` 的值，作为单个参数传入。默认限定到 skill 脚本目录；只在需要时放宽为 `Bash(node:*)`（允许任意 node 代码） |
+| `PEGBOARD_CLAUDE_FLAGS` | （空） | 额外杂项 CLI 参数，空格分隔（不要把 `--allowedTools` 放这里） |
 | `PEGBOARD_CLAUDE_CWD` | `$HOME` | Agent 工作目录 |
 | `PEGBOARD_CLAUDE_TIMEOUT_MS` | `600000` | 单轮超时 |
 
