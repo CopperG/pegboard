@@ -7,7 +7,9 @@ description: 洞洞板 (PegBoard) 画布面板管理。通过 WebSocket (localho
 
 通过 WebSocket (localhost:9800) 管理洞洞板画布上的面板。
 
-**连接**: `ws://localhost:9800?token=<token>`，Token 位于 `~/.pegboard/config/ws-token.json`
+**连接**: `ws://localhost:9800?token=<token>`，Token 位于 `~/.pegboard/config/ws-token.json`（脚本自动读取，无需手动传入）
+
+**`{baseDir}` 说明**: 指本 skill 的安装目录。在 Claude Code 中即 skill 加载时注入的 "Base directory"；直接把 `{baseDir}` 替换为该路径执行命令。
 
 **核心能力**: 画布顶部 6 个分类 Tab（重要/日常/工作/娱乐/其他/全部），面板通过 `tags` 字段分配到对应 Tab。
 
@@ -245,7 +247,7 @@ node {baseDir}/scripts/theme_control.mjs '{"action":"registerTheme","themeName":
 
 ## canvasState 解读
 
-channel-adapter 每轮注入画布状态：
+宿主（OpenClaw 的 channel-adapter，或 Claude Code 的 claude-bridge）会在每条用户消息中注入画布状态；也可随时用 `canvas_query.mjs '{"action":"listPanels"}'` 主动获取：
 
 ```json
 {
