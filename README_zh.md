@@ -17,12 +17,6 @@ Agent 调用工具，面板自动生成，数据即时可视化。无需手动�
 
 ---
 
-<p align="center">
-  <img src="docs/screenshots/light.png" width="32%" alt="浅色主题" />
-  <img src="docs/screenshots/dark.png" width="32%" alt="深色主题" />
-  <img src="docs/screenshots/system.png" width="32%" alt="跟随系统" />
-</p>
-
 ## 洞洞板是什么？
 
 想象一块挂在墙上的洞洞板（pegboard），你可以在上面挂工具、置物架、挂钩、收纳盒——任何东西。洞洞板把这个概念搬到了桌面上，但挂载的是 **AI 生成的内容**。
@@ -102,7 +96,43 @@ pnpm tauri dev
 cp -r skill/ <openclaw-skills-dir>/pegboard
 ```
 
-### 安装 Channel 插件（可选）
+### 配合 Claude Code 使用
+
+Pegboard 开箱即支持 [Claude Code](https://claude.com/claude-code)。
+
+1. 安装 skill，让 Claude Code 能控制面板：
+
+```bash
+cp -r skill/ ~/.claude/skills/pegboard
+```
+
+2. 启动聊天桥接器，让 Pegboard 聊天栏的消息到达 Claude Code：
+
+```bash
+node claude-bridge/index.mjs
+# 或安装为 launchd 常驻服务（开机自启、崩溃自拉）：
+./claude-bridge/install-launchd.sh
+```
+
+桥接器维持一个长驻 claude 进程（流式 JSON 输入输出），把每条聊天消息作为
+一轮对话转发，并把回复流式回传聊天栏。面板操作由 Claude Code 通过 skill
+脚本直接完成。会话在 24 小时内可跨桥接器重启延续。
+
+**不要同时运行桥接器和 OpenClaw channel 插件** —— 两者消费同样的聊天消息，
+会出现两份交错回复。
+
+环境变量配置：
+
+| 变量 | 默认值 | 用途 |
+|------|--------|------|
+| `PEGBOARD_CLAUDE_BIN` | `claude` | Claude Code 可执行文件 |
+| `PEGBOARD_CLAUDE_FLAGS` | 限定到 skill 脚本的 allowlist | 额外 CLI 参数。注意 `Bash(node:*)` 允许任意 node 代码，需要更紧沙箱请收窄 |
+| `PEGBOARD_CLAUDE_CWD` | `$HOME` | Agent 工作目录 |
+| `PEGBOARD_CLAUDE_TIMEOUT_MS` | `600000` | 单轮超时 |
+
+如果只在交互式 Claude Code 会话中控制面板（不用聊天栏），只装 skill 即可。
+
+### 安装 OpenClaw Channel 插件（可选，仅 OpenClaw —— 勿与 claude-bridge 同时运行）
 
 `channel-adapter/` 目录包含一个 OpenClaw channel 插件，用于桥接 Agent 和洞洞板之间的 WebSocket 连接。如果你的部署需要专用 channel，可以安装它：
 
