@@ -121,7 +121,7 @@ export interface ChatStore {
   isStreaming: boolean
 
   addMessage: (msg: ChatMessage) => void
-  appendToLastMessage: (content: string) => void
+  appendToMessage: (id: string, content: string) => void
   setStreaming: (val: boolean) => void
   clearMessages: () => void
 }

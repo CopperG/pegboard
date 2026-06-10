@@ -58,11 +58,16 @@ export function useWebSocket() {
   const clearCanvas = useCanvasStore((s) => s.clearCanvas)
   const addMessage = useChatStore((s) => s.addMessage)
   const setStreaming = useChatStore((s) => s.setStreaming)
-  const appendToLastMessage = useChatStore((s) => s.appendToLastMessage)
 
   // Timer refs for reconnection and disconnect debounce
   const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const disconnectDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Watchdog: if no stream activity for 90s, the bridge/agent died mid-reply.
+  // (Cannot use ws-status-change for this — ephemeral skill-script
+  // connections closing would false-trigger it.)
+  const STREAM_INACTIVITY_MS = 90_000
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Grace period before showing "disconnected" — handles ephemeral skill connections
   const DISCONNECT_DEBOUNCE_MS = 3000
@@ -145,6 +150,7 @@ export function useWebSocket() {
       if (disconnectDebounceRef.current) {
         clearTimeout(disconnectDebounceRef.current)
       }
+      if (watchdogRef.current) clearTimeout(watchdogRef.current)
       realtimeManager.stopAll()
     }
   }, []) // stable selectors from zustand, no need in deps
@@ -250,6 +256,21 @@ export function useWebSocket() {
 
   // ── Stream Handlers ─────────────────────────────────────────────────
 
+  function kickWatchdog() {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current)
+    watchdogRef.current = setTimeout(() => {
+      watchdogRef.current = null
+      setStreaming(false)
+    }, STREAM_INACTIVITY_MS)
+  }
+
+  function clearWatchdog() {
+    if (watchdogRef.current) {
+      clearTimeout(watchdogRef.current)
+      watchdogRef.current = null
+    }
+  }
+
   function handleStreamStart(msg: StreamStart) {
     addMessage({
       id: msg.messageId,
@@ -258,13 +279,16 @@ export function useWebSocket() {
       timestamp: msg.timestamp,
     })
     setStreaming(true)
+    kickWatchdog()
   }
 
   function handleStreamChunk(msg: StreamChunk) {
-    appendToLastMessage(msg.content)
+    useChatStore.getState().appendToMessage(msg.messageId, msg.content)
+    kickWatchdog()
   }
 
   function handleStreamEnd(_msg: StreamEnd) {
+    clearWatchdog()
     setStreaming(false)
   }
 
