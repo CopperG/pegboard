@@ -8,12 +8,13 @@ export function usePersistence() {
     // 1. Ensure data directories exist
     invoke('ensure_data_dirs').catch(console.error)
 
-    // 2. Load saved state on startup
+    // 2. Load saved state, THEN take the daily snapshot — the snapshot must
+    // not run against an empty store before persisted panels are restored.
     // createPanel deduplicates by panelId, safe to call twice under StrictMode
-    loadSavedState()
-
-    // 3. Daily snapshot
-    handleDailySnapshot()
+    ;(async () => {
+      await loadSavedState()
+      await handleDailySnapshot()
+    })()
 
     // 4. Subscribe to state changes for auto-save
     const unsubscribe = useCanvasStore.subscribe(
