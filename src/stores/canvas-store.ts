@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { immer } from 'zustand/middleware/immer'
-import type { CanvasStore, PanelState, ArchivedPanel, PanelLayoutPosition } from '@/types/store'
+import type { CanvasStore, PanelState, ArchivedPanel } from '@/types/store'
 import type {
   PanelMessage,
   JsonPatchOperation,
