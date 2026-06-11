@@ -37,4 +37,19 @@ describe('canvas-store', () => {
     expect((panel.data as { content: string }).content).toBe('new')
     expect(Date.parse(panel.updatedAt)).toBeGreaterThan(Date.parse(before))
   })
+
+  it('getCanvasState summarizes list items using text alias when title missing', () => {
+    useCanvasStore.getState().createPanel(
+      makePanelMessage({
+        panelId: 'list1',
+        panelType: 'list',
+        data: { items: [{ id: '1', text: 'aliased' }] },
+      }),
+    )
+    const snapshot = useCanvasStore.getState().getCanvasState()
+    const summary = [...snapshot.pinnedPanels, ...snapshot.transientPanels].find(
+      (p) => p.id === 'list1',
+    )
+    expect(summary?.dataSummary).toContain('aliased')
+  })
 })

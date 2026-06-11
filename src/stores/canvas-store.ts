@@ -77,7 +77,7 @@ function summarizeData(data: unknown): string | undefined {
       // List panel: preview item titles
       const preview = items
         .slice(0, 3)
-        .map((i) => (i.title as string) || '?')
+        .map((i) => (i.title as string) || (i.text as string) || '?')
         .join(', ')
       const suffix = count > 3 ? ', ...' : ''
       return `${count} items: ${preview}${suffix}`
