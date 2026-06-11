@@ -13,7 +13,7 @@
   "retry_connection": "Retry connection",
   "added_to_category": "Added to {{category}}",
   "already_in_category": "Already in this category",
-  "removed_from_category": "Removed from \"{{category}}\"",
+  "removed_from_category": "Removed from {{category}}",
   "toggle_sidebar": "Panel list",
   "toggle_chat": "Chat"
 }
