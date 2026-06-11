@@ -76,8 +76,18 @@ async function loadSavedState() {
             css: panel.css,
             starred: panel.starred,
             tags: panel.tags,
+            interaction: panel.interaction,
+            realtime: panel.realtime,
           })
         }
+        // createPanel stamps NOW into createdAt/updatedAt — restore persisted values
+        store.restorePanelTimestamps(
+          saved.panels.map((p: { panelId: string; createdAt?: string; updatedAt?: string }) => ({
+            panelId: p.panelId,
+            createdAt: p.createdAt,
+            updatedAt: p.updatedAt,
+          })),
+        )
       }
 
       // Restore archived panels

@@ -52,4 +52,21 @@ describe('canvas-store', () => {
     )
     expect(summary?.dataSummary).toContain('aliased')
   })
+
+  it('restorePanelTimestamps restores persisted timestamps', () => {
+    useCanvasStore.getState().createPanel(makePanelMessage())
+    useCanvasStore.getState().restorePanelTimestamps([
+      { panelId: 'p1', createdAt: '2026-06-01T08:00:00.000Z', updatedAt: '2026-06-09T12:00:00.000Z' },
+    ])
+    const panel = useCanvasStore.getState().panels[0]!
+    expect(panel.createdAt).toBe('2026-06-01T08:00:00.000Z')
+    expect(panel.updatedAt).toBe('2026-06-09T12:00:00.000Z')
+  })
+
+  it('createPanel passes interaction config through', () => {
+    useCanvasStore.getState().createPanel(
+      makePanelMessage({ interaction: { checkable: true } }),
+    )
+    expect(useCanvasStore.getState().panels[0]!.interaction).toEqual({ checkable: true })
+  })
 })

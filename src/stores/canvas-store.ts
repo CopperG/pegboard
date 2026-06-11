@@ -406,6 +406,17 @@ export const useCanvasStore = create<CanvasStore>()(
       })
     },
 
+    restorePanelTimestamps: (entries) => {
+      set((state) => {
+        for (const entry of entries) {
+          const panel = state.panels.find((p) => p.panelId === entry.panelId)
+          if (!panel) continue
+          if (entry.createdAt) panel.createdAt = entry.createdAt
+          if (entry.updatedAt) panel.updatedAt = entry.updatedAt
+        }
+      })
+    },
+
     resizePanel: (panelId: string, w: number, h: number) => {
       const clampedW = Math.max(1, Math.min(18, w))
       const clampedH = Math.max(1, Math.min(18, h))

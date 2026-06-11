@@ -84,6 +84,9 @@ export interface CanvasStore {
   toggleStar: (panelId: string) => void
   setStar: (panelId: string, starred: boolean) => void
   setTags: (panelId: string, tags: string[]) => void
+  restorePanelTimestamps: (
+    entries: { panelId: string; createdAt?: string; updatedAt?: string }[],
+  ) => void
   resizePanel: (panelId: string, w: number, h: number) => void
   changePanelType: (panelId: string, newType: string, newData?: unknown, newTitle?: string, newSubtitle?: string) => void
   applyAgentLayout: (layout: { panelId: string; x: number; y: number; w: number; h: number }[]) => void
