@@ -69,4 +69,18 @@ describe('canvas-store', () => {
     )
     expect(useCanvasStore.getState().panels[0]!.interaction).toEqual({ checkable: true })
   })
+
+  it('createPanel passes realtime config through', () => {
+    useCanvasStore.getState().createPanel(
+      makePanelMessage({
+        realtime: { enabled: true, source: 'ws', interval: 5000, maxRetries: 3 },
+      }),
+    )
+    expect(useCanvasStore.getState().panels[0]!.realtime).toEqual({
+      enabled: true,
+      source: 'ws',
+      interval: 5000,
+      maxRetries: 3,
+    })
+  })
 })

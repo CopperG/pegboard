@@ -10,7 +10,11 @@ export function usePersistence() {
 
     // 2. Load saved state, THEN take the daily snapshot — the snapshot must
     // not run against an empty store before persisted panels are restored.
-    // createPanel deduplicates by panelId, safe to call twice under StrictMode
+    // createPanel deduplicates by panelId, safe to call twice under StrictMode.
+    // NOTE: loadSavedState must keep the createPanel loop and restorePanelTimestamps
+    // in one synchronous block (no await between them) — a second StrictMode pass
+    // re-stamps updatedAt via the dedup->updatePanel path and the synchronous
+    // restore call is what heals it before any render.
     ;(async () => {
       await loadSavedState()
       await handleDailySnapshot()
@@ -51,7 +55,7 @@ export function usePersistence() {
   }, [])
 }
 
-async function loadSavedState() {
+export async function loadSavedState() {
   try {
     const json = await invoke<string | null>('load_canvas_state')
     if (json) {
