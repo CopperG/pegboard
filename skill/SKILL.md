@@ -56,6 +56,12 @@ node {baseDir}/scripts/panel_control.mjs '{"action":"create","panelType":"table"
 # 创建带勾选的列表
 node {baseDir}/scripts/panel_control.mjs '{"action":"create","panelType":"list","title":"待办事项","data":{"items":[{"id":"1","title":"买牛奶"},{"id":"2","title":"写报告"}]},"interaction":{"checkable":true}}'
 
+# 创建可勾选的日程时间轴
+node {baseDir}/scripts/panel_control.mjs '{"action":"create","panelType":"timeline","title":"今日日程","data":{"events":[{"id":"1","title":"晨会","date":"2026-06-10T09:30"},{"id":"2","title":"游泳","date":"2026-06-10T14:00"}],"viewMode":"day"},"interaction":{"checkable":true}}'
+
+# 创建可编辑的文本面板（用户双击可改内容，修改经 panel_user_action 回传）
+node {baseDir}/scripts/panel_control.mjs '{"action":"create","panelType":"text","title":"草稿","data":{"summary":"随手记","content":"# 草稿\n\n双击编辑","format":"markdown"},"interaction":{"editable":true}}'
+
 # 创建面板并分类到「工作」和「重要」Tab
 node {baseDir}/scripts/panel_control.mjs '{"action":"create","panelType":"text","title":"周报","data":{"summary":"本周进展","content":"# 周报","format":"markdown"},"tags":["work","important"]}'
 

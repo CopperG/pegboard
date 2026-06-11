@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PanelSize } from '@/types/layout'
-import { useCanvasStore, selectPanelStarred } from '@/stores/canvas-store'
+import { useCanvasStore, selectPanelStarred, selectPanelUpdatedAt, selectPanelTags } from '@/stores/canvas-store'
+import { useRelativeTime } from '@/hooks/useRelativeTime'
 import { getPanelIcon } from '@/lib/panel-icons'
 import {
   Popover,
@@ -12,8 +13,10 @@ import {
 } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import {
-  Pin, Star, Archive, Search, MoreHorizontal, X,
+  Pin, Star, Archive, Search, MoreHorizontal, X, Check,
 } from 'lucide-react'
+import { toast } from 'sonner'
+import { CATEGORY_ORDER, toggleCategoryTag } from '@/lib/category-tags'
 import { setIframeLayerExpanded } from './SandboxRenderer'
 
 const actionItemClass =
@@ -28,19 +31,24 @@ const actionItemClass =
 function PanelActionsMenu({
   pinned,
   starred,
+  tags,
   onPin,
   onStar,
   onArchive,
   onExpand,
+  onToggleCategory,
 }: {
   pinned: boolean
   starred: boolean
+  tags: string[]
   onPin: () => void
   onStar: () => void
   onArchive: () => void
   onExpand: () => void
+  onToggleCategory: (category: string) => void
 }) {
   const { t } = useTranslation('panels')
+  const { t: tCanvas } = useTranslation('canvas')
   const [open, setOpen] = useState(false)
 
   const act = (fn: () => void) => {
@@ -80,6 +88,24 @@ function PanelActionsMenu({
             <Search className="w-3.5 h-3.5 shrink-0" />
             {t('expand_view')}
           </button>
+          {/* Category toggles — popover stays open for multi-adjust */}
+          <div className="my-1 h-px bg-border/60" />
+          <div className="px-1.5 py-0.5 text-[10px] text-muted-foreground select-none">
+            {t('category')}
+          </div>
+          {CATEGORY_ORDER.map((category) => (
+            <button
+              key={category}
+              type="button"
+              className={actionItemClass}
+              onClick={() => onToggleCategory(category)}
+            >
+              <span className="w-3.5 h-3.5 shrink-0 inline-flex items-center justify-center">
+                {tags.includes(category) && <Check className="w-3.5 h-3.5" />}
+              </span>
+              {tCanvas(category)}
+            </button>
+          ))}
         </PopoverContent>
       </Popover>
     </div>
@@ -110,6 +136,10 @@ export function PanelShell({
 }: PanelShellProps) {
   const [expanded, setExpanded] = useState(false)
   const starred = useCanvasStore(selectPanelStarred(panelId))
+  const updatedAt = useCanvasStore(selectPanelUpdatedAt(panelId))
+  const { relative: updatedRelative, absolute: updatedAbsolute } = useRelativeTime(updatedAt)
+  const { t: tCanvasToast } = useTranslation('canvas')
+  const tags = useCanvasStore(selectPanelTags(panelId)) ?? []
 
   const shellRef = useRef<HTMLDivElement>(null)
   const panelIcon = panelType ? getPanelIcon(panelType) : null
@@ -139,6 +169,19 @@ export function PanelShell({
   const handleArchive = useCallback(() => {
     useCanvasStore.getState().archivePanel(panelId)
   }, [panelId])
+
+  const handleToggleCategory = useCallback((category: string) => {
+    const store = useCanvasStore.getState()
+    const panel = store.panels.find((p) => p.panelId === panelId)
+    if (!panel) return
+    const wasActive = (panel.tags ?? []).includes(category)
+    store.setTags(panelId, toggleCategoryTag(panel.tags, category))
+    toast.success(
+      wasActive
+        ? tCanvasToast('removed_from_category', { category: tCanvasToast(category) })
+        : tCanvasToast('added_to_category', { category: tCanvasToast(category) }),
+    )
+  }, [panelId, tCanvasToast])
 
   // Bump iframe layer z-index above overlay when HTML panel is expanded
   useEffect(() => {
@@ -198,13 +241,23 @@ export function PanelShell({
               <Star className="w-3.5 h-3.5 text-panel-star fill-panel-star ml-1 shrink-0 drop-shadow-sm" />
             )}
             <span className="flex-1" />
+            {updatedRelative && (
+              <span
+                className="text-[10px] text-panel-overlay-text/70 mx-1.5 shrink-0 tabular-nums drop-shadow-sm"
+                title={updatedAbsolute}
+              >
+                {updatedRelative}
+              </span>
+            )}
             <PanelActionsMenu
               pinned={pinned}
               starred={starred}
+              tags={tags}
               onPin={handlePin}
               onStar={handleStar}
               onArchive={handleArchive}
               onExpand={() => setExpanded(true)}
+              onToggleCategory={handleToggleCategory}
             />
           </div>
           {/* Image: edge-to-edge content */}
@@ -247,13 +300,23 @@ export function PanelShell({
               </span>
             )}
             <span className="flex-1" />
+            {updatedRelative && (
+              <span
+                className="text-[10px] text-muted-foreground/70 mx-1.5 shrink-0 tabular-nums"
+                title={updatedAbsolute}
+              >
+                {updatedRelative}
+              </span>
+            )}
             <PanelActionsMenu
               pinned={pinned}
               starred={starred}
+              tags={tags}
               onPin={handlePin}
               onStar={handleStar}
               onArchive={handleArchive}
               onExpand={() => setExpanded(true)}
+              onToggleCategory={handleToggleCategory}
             />
           </div>
 

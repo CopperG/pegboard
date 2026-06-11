@@ -46,20 +46,26 @@ export type TablePanelData = z.infer<typeof TablePanelDataSchema>
 
 export const ListPanelDataSchema = z.object({
   items: z.array(
-    z.object({
-      id: z.string(),
-      title: z.string(),
-      subtitle: z.string().optional(),
-      icon: z.string().optional(),
-      badge: z
-        .object({
-          text: z.string(),
-          color: z.enum(['red', 'green', 'blue', 'yellow', 'gray']),
-        })
-        .optional(),
-      linkedPanel: z.string().optional(),
-      metadata: z.record(z.string(), z.unknown()).optional(),
-    }),
+    z
+      .object({
+        id: z.string(),
+        title: z.string().optional(),
+        text: z.string().optional(), // agent compat: alias for title
+        subtitle: z.string().optional(),
+        icon: z.string().optional(),
+        badge: z
+          .object({
+            text: z.string(),
+            color: z.enum(['red', 'green', 'blue', 'yellow', 'gray']),
+          })
+          .optional(),
+        checked: z.boolean().optional(), // user/agent maintained when checkable
+        linkedPanel: z.string().optional(),
+        metadata: z.record(z.string(), z.unknown()).optional(),
+      })
+      .refine((item) => !!(item.title || item.text), {
+        message: 'list item requires title or text',
+      }),
   ),
   emptyText: z.string().optional(),
 })
@@ -121,6 +127,7 @@ export const TimelinePanelDataSchema = z.object({
       description: z.string().optional(),
       color: z.string().optional(),
       group: z.string().optional(),
+      checked: z.boolean().optional(), // user/agent maintained when checkable
     }),
   ),
   viewMode: z.enum(['day', 'week', 'month']),

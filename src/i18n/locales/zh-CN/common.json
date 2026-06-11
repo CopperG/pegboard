@@ -20,6 +20,8 @@
   "sort": "排序",
   "send": "发送",
   "items_count": "{{count}} 个面板",
+  "select_all": "全选",
+  "completed_count": "已完成 {{done}}/{{total}}",
   "drop_files_here": "拖放文件到这里",
   "unsupported_file": "不支持的文件类型",
   "file_too_large": "文件过大 (最大 {{max}}MB)",

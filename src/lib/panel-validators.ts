@@ -1,5 +1,10 @@
 import { PanelDataSchemaMap } from '@/types/panel-data'
 
+/** Whether a structured-data schema exists for this panel type (html/_fallback have none) */
+export function hasPanelDataSchema(panelType: string): boolean {
+  return panelType in PanelDataSchemaMap
+}
+
 export function validatePanelData(
   panelType: string,
   data: unknown,

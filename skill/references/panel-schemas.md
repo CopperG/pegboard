@@ -34,7 +34,8 @@
   "items": [                          // 必填
     {
       "id": "1", "title": "第一项", "subtitle": "说明",
-      "badge": { "text": "新", "color": "blue" }
+      "badge": { "text": "新", "color": "blue" },
+      "checked": false                // 可选: checkable 列表的勾选状态
     },
     { "id": "2", "title": "第二项", "subtitle": "说明" }
   ],
@@ -88,7 +89,8 @@
       "title": "周会",
       "date": "2026-03-10T10:00",
       "endDate": "2026-03-10T11:00",
-      "color": "#3b82f6"
+      "color": "#3b82f6",
+      "checked": false                // 可选: checkable 时间轴的完成状态
     }
   ],
   "viewMode": "week"                  // 必填: "day" | "week" | "month"
@@ -115,8 +117,8 @@
 |------|------|----------|------|
 | `sortable` | boolean | table | 表格列排序 |
 | `filterable` | boolean | table | 表格列筛选 |
-| `checkable` | boolean | list | 列表项勾选框 |
-| `editable` | boolean | kv | 键值对内联编辑 |
+| `checkable` | boolean | list, timeline | 条目/事件勾选框 |
+| `editable` | boolean | kv, text | 内联编辑（kv 双击改值；text 双击编辑全文）|
 
 ### 用户交互产生的消息
 
@@ -132,7 +134,25 @@
 }
 ```
 
-可用 `action` 值：`pin` | `unpin` | `archive` | `restore` | `close` | `check_item` | `edit_value` | `status_change`
+可用 `action` 值：`pin` | `unpin` | `archive` | `restore` | `close` | `focus` | `check_item` | `edit_value` | `status_change`
+
+各 action 的 payload：
+
+| action | 来源面板 | payload |
+|--------|----------|---------|
+| `check_item` | list, timeline | `{ "itemId": "<item/event id>", "checked": true }` |
+| `edit_value` | kv | `{ "key": "...", "oldValue": "...", "newValue": "..." }` |
+| `edit_value` | text | `{ "field": "content", "newValue": "<完整新内容>" }` |
+| `status_change` | kv | `{ "key": "...", "oldStatus": "...", "newStatus": "..." }` |
+
+## Agent 数据保全规则（重要）
+
+用户可以直接在面板上修改数据（勾选、编辑文本/键值）。为避免覆盖用户的修改：
+
+1. 更新带 `interaction`（checkable/editable）的面板前，先用 `canvas_query` 的 `getPanelDetail` 读取最新 data，在其基础上修改。
+2. 局部修改优先使用 `patch`（JSON Patch），避免全量 `data` 覆盖。
+3. 必须全量覆盖 `data` 时，要保留 `items[].checked`、`events[].checked`、`content` 等用户可写字段的当前值。
+4. 用户操作会通过 `panel_user_action` 实时推送，收到后应将变更并入后续输出。
 
 ## 附件支持 (`attachments`)
 

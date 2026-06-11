@@ -11,6 +11,7 @@ src-tauri/target/
 config/secrets.yml
 docs/*
 !docs/screenshots/
+!docs/superpowers/
 # Claude Code
 .claude/
 CLAUDE.md

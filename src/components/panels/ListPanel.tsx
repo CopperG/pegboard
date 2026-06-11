@@ -1,9 +1,9 @@
 import { useMemo, useCallback, useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'react-window'
-import { invoke } from '@tauri-apps/api/core'
 import { ChevronRight } from 'lucide-react'
-import { useCanvasStore } from '@/stores/canvas-store'
+import { useCanvasStore, updatePanelData } from '@/stores/canvas-store'
+import { sendPanelUserAction } from '@/lib/ws-protocol'
 import type { PanelProps } from './PanelRegistry'
 
 interface ListBadge {
@@ -184,7 +184,6 @@ export function ListPanel({ panelId, data }: PanelProps) {
   const { t: tCommon } = useTranslation('common')
   const containerRef = useRef<HTMLDivElement>(null)
   const [containerHeight, setContainerHeight] = useState(400)
-  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set())
 
   const interaction = useCanvasStore(
     (s) => s.panels.find((p) => p.panelId === panelId)?.interaction,
@@ -201,84 +200,54 @@ export function ListPanel({ panelId, data }: PanelProps) {
     return { ...data, items }
   }, [data])
 
-  // Initialise checked state from data (agent may send checked: true)
-  const initialCheckedRef = useRef(false)
-  useEffect(() => {
-    if (panelData && !initialCheckedRef.current) {
-      initialCheckedRef.current = true
-      const ids = new Set<string>()
-      for (const item of (data as ListPanelData).items) {
-        if (item.checked) ids.add(item.id)
-      }
-      if (ids.size > 0) setCheckedIds(ids)
+  // Single source of truth: data.items[].checked (agent updates apply live, persisted to disk)
+  const checkedIds = useMemo(() => {
+    const ids = new Set<string>()
+    for (const item of panelData?.items ?? []) {
+      if (item.checked) ids.add(item.id)
     }
-  }, [panelData, data])
+    return ids
+  }, [panelData])
 
-  const handleNavigate = useCallback((targetPanelId: string) => {
-    useCanvasStore.getState().focusPanel(targetPanelId)
-    invoke('send_ws_message', {
-      message: JSON.stringify({
-        type: 'panel_user_action',
-        action: 'focus',
-        panelId: targetPanelId,
-        timestamp: new Date().toISOString(),
-      }),
-    }).catch(console.error)
-  }, [])
-
-  const handleCheck = useCallback(
-    (itemId: string, checked: boolean) => {
-      setCheckedIds((prev) => {
-        const next = new Set(prev)
-        if (checked) {
-          next.add(itemId)
-        } else {
-          next.delete(itemId)
-        }
-        return next
-      })
-
-      // Send action to agent
-      invoke('send_ws_message', {
-        message: JSON.stringify({
-          type: 'panel_user_action',
-          action: 'check_item',
-          panelId,
-          payload: { itemId, checked },
-          timestamp: new Date().toISOString(),
-        }),
-      }).catch(console.error)
+  /** Optimistic update: write checked changes back into store panel.data */
+  const applyCheckedToStore = useCallback(
+    (updates: Map<string, boolean>) => {
+      updatePanelData<ListPanelData>(panelId, (d) => ({
+        ...d,
+        items: d.items.map((i) =>
+          updates.has(i.id) ? { ...i, checked: updates.get(i.id)! } : i,
+        ),
+      }))
     },
     [panelId],
   )
 
+  const handleNavigate = useCallback((targetPanelId: string) => {
+    useCanvasStore.getState().focusPanel(targetPanelId)
+    sendPanelUserAction(targetPanelId, 'focus')
+  }, [])
+
+  const handleCheck = useCallback(
+    (itemId: string, checked: boolean) => {
+      applyCheckedToStore(new Map([[itemId, checked]]))
+      sendPanelUserAction(panelId, 'check_item', { itemId, checked })
+    },
+    [panelId, applyCheckedToStore],
+  )
+
   const handleSelectAll = useCallback(() => {
     if (!panelData) return
-    const allIds = new Set(panelData.items.map((item) => item.id))
     const allChecked = panelData.items.every((item) => checkedIds.has(item.id))
+    const newChecked = !allChecked
 
-    if (allChecked) {
-      setCheckedIds(new Set())
-    } else {
-      setCheckedIds(allIds)
-    }
+    applyCheckedToStore(new Map(panelData.items.map((i) => [i.id, newChecked] as const)))
 
-    // Send bulk action - we notify agent about the toggle
     for (const item of panelData.items) {
-      const newChecked = !allChecked
       if (newChecked !== checkedIds.has(item.id)) {
-        invoke('send_ws_message', {
-          message: JSON.stringify({
-            type: 'panel_user_action',
-            action: 'check_item',
-            panelId,
-            payload: { itemId: item.id, checked: newChecked },
-            timestamp: new Date().toISOString(),
-          }),
-        }).catch(console.error)
+        sendPanelUserAction(panelId, 'check_item', { itemId: item.id, checked: newChecked })
       }
     }
-  }, [panelData, panelId, checkedIds])
+  }, [panelData, panelId, checkedIds, applyCheckedToStore])
 
   // Measure container height for virtual scrolling
   useEffect(() => {

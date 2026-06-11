@@ -19,7 +19,7 @@ export const CATEGORY_TAGS: Record<Exclude<CanvasView, 'all'>, string> = {
 }
 
 /** Valid category tag values (excludes 'all' which is a view, not a tag) */
-const VALID_CATEGORY_SET = new Set(Object.values(CATEGORY_TAGS))
+export const VALID_CATEGORY_SET = new Set(Object.values(CATEGORY_TAGS))
 
 /**
  * Ensure tags always contain at least one valid category.

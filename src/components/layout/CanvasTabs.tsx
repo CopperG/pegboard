@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
 import type { CanvasView } from '@/types/layout'
 import { CANVAS_VIEW_ORDER, CATEGORY_TAGS } from '@/types/layout'
+import { addCategoryTag } from '@/lib/category-tags'
 import { LayoutGrid, Star, Clock, Briefcase, Gamepad2, MoreHorizontal, PanelLeft, MessageSquare } from 'lucide-react'
 import { ArchiveDrawer } from '@/components/canvas/ArchiveDrawer'
 import { ConnectionDot } from '@/components/layout/Sidebar'
@@ -95,7 +96,7 @@ export function CanvasTabs({ sidebarOpen, onToggleSidebar, chatOpen, onToggleCha
       return
     }
 
-    store.setTags(panelId, [...currentTags, tag])
+    store.setTags(panelId, addCategoryTag(currentTags, tag))
     toast.success(t('added_to_category', { category: t(TAB_KEYS[view]) }))
   }, [t])
 
