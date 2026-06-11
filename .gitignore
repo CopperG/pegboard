@@ -38,6 +38,7 @@ Thumbs.db
 .claude/
 CLAUDE.md
 MEMORY.md
+TODOS.md
 docs/*
 !docs/screenshots/
 .interface-design/
