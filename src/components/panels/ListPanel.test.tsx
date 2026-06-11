@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { invoke } from '@tauri-apps/api/core'
 import { ListPanel } from '@/components/panels/ListPanel'
@@ -29,10 +29,6 @@ describe('ListPanel checked derives from data', () => {
   beforeEach(() => {
     resetCanvasStore()
     vi.mocked(invoke).mockClear()
-  })
-
-  afterEach(() => {
-    cleanup()
   })
 
   it('checkbox state comes from data.items[].checked', () => {

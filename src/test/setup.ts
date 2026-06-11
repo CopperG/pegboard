@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom/vitest'
-import { vi, beforeEach } from 'vitest'
+import { vi, beforeEach, afterEach } from 'vitest'
+import { cleanup } from '@testing-library/react'
 
 // Node.js v22+ exposes a native localStorage that requires --localstorage-file.
 // Override it with a simple in-memory implementation so jsdom tests can use it.
@@ -19,6 +20,11 @@ Object.defineProperty(globalThis, 'localStorage', {
 
 beforeEach(() => {
   localStorageMock.clear()
+})
+
+// testing-library auto-cleanup needs vitest globals; we don't use globals, so do it explicitly
+afterEach(() => {
+  cleanup()
 })
 
 // Tauri IPC does not exist in jsdom
