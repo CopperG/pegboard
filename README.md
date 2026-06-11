@@ -10,7 +10,6 @@ AI agent calls tools. Panels appear. Data visualized. No manual UI work.
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://v2.tauri.app)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Ready-blueviolet)](https://claude.com/claude-code)
-[![OpenClaw](https://img.shields.io/badge/OpenClaw-Ready-green)](https://github.com/nicepkg/openclaw)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [English](README.md) | [中文](README_zh.md)
@@ -79,7 +78,7 @@ The agent sees a snapshot of your canvas with every message, so it knows what's 
 ### Prerequisites
 
 - [Rust](https://rustup.rs/) + [Node.js](https://nodejs.org/) + [pnpm](https://pnpm.io/)
-- [OpenClaw](https://github.com/nicepkg/openclaw) installed
+- [Claude Code](https://claude.com/claude-code) for chat conversations (optional if you only need panel control)
 
 ### Run the app
 
@@ -92,17 +91,16 @@ pnpm tauri dev
 
 ### Install the Skill
 
-Copy the `skill/` directory to your OpenClaw skills folder so the agent can control Pegboard panels:
+Copy the `skill/` directory to your agent's skills folder so the agent can control Pegboard panels:
 
 ```bash
-cp -r skill/ <openclaw-skills-dir>/pegboard
+cp -r skill/ <your-agent-skills-dir>/pegboard
 ```
 
 > **Agent compatibility status**
 >
-> - **Skill (panel control)**: universal — any agent that can run the skill scripts can control panels (Claude Code, OpenClaw, ...).
+> - **Skill (panel control)**: universal — any agent that can run the skill scripts (zero-dependency Node) can control panels.
 > - **Chat conversations**: currently focused on **Claude Code** (via claude-bridge, see below).
-> - **OpenClaw channel mode**: only compatible with the **legacy OpenClaw** channel protocol; the new OpenClaw version is not supported yet.
 > - Chat integration for other agents is planned but not yet developed.
 
 ### Use with Claude Code
@@ -132,8 +130,8 @@ one persistent `claude` process alive (streaming JSON in/out), forwards each
 chat message as a turn, and streams the reply back to the chat bar. Panel tool calls are made by Claude Code itself through the skill scripts.
 Sessions survive bridge restarts within 24 hours.
 
-**Do not run the bridge and the OpenClaw channel plugin at the same time** —
-both consume the same chat messages and you will get two interleaved replies.
+**Run only one chat bridge at a time** — two consumers of the same chat
+messages will produce two interleaved replies.
 
 Configuration (env vars):
 
@@ -148,22 +146,10 @@ Configuration (env vars):
 If you only need panel control from an interactive Claude Code session
 (no chat bar), installing the skill alone is enough.
 
-### Install the OpenClaw Channel Plugin (optional, legacy OpenClaw only — do not combine with claude-bridge)
-
-**Note: the channel plugin currently only works with the legacy OpenClaw channel mode; the new OpenClaw version is not supported yet.** For chat conversations, the Claude Code bridge above is the recommended path.
-
-The `channel-adapter/` directory contains an OpenClaw channel plugin that bridges the WebSocket connection between the agent and Pegboard. Install it if your setup requires a dedicated channel:
-
-```bash
-cp -r channel-adapter/ <openclaw-plugins-dir>/pegboard
-```
-
-If not installed, you can tell the agent to connect to Pegboard directly — it will read the token from `~/.pegboard/config/ws-token.json` and establish the WebSocket connection.
-
 ## How It Works
 
 1. **Pegboard starts** — WS server listens on `:9800`, writes auth token to `~/.pegboard/config/ws-token.json`
-2. **Your agent connects** — claude-bridge or the OpenClaw channel plugin reads the token and establishes a persistent WebSocket connection
+2. **Your agent connects** — claude-bridge reads the token and establishes a persistent WebSocket connection
 3. **You chat** — Press `⌘J`, type a message. It flows through WS to the agent
 4. **Agent responds** — Streams text back to the chat bar, and calls Skill tools to create/update panels
 5. **Canvas updates** — Panels appear, rearrange, and update in real time

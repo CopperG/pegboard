@@ -10,7 +10,6 @@ Agent 调用工具，面板自动生成，数据即时可视化。无需手动�
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://v2.tauri.app)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-Ready-blueviolet)](https://claude.com/claude-code)
-[![OpenClaw](https://img.shields.io/badge/OpenClaw-Ready-green)](https://github.com/nicepkg/openclaw)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 [English](README.md) | [中文](README_zh.md)
@@ -79,7 +78,7 @@ Agent 每次收到消息时都会看到画布快照，了解屏幕上已有的�
 ### 前置条件
 
 - [Rust](https://rustup.rs/) + [Node.js](https://nodejs.org/) + [pnpm](https://pnpm.io/)
-- [OpenClaw](https://github.com/nicepkg/openclaw) 已安装
+- [Claude Code](https://claude.com/claude-code)（用于聊天对话；只需面板控制可不装）
 
 ### 启动应用
 
@@ -92,17 +91,16 @@ pnpm tauri dev
 
 ### 安装 Skill
 
-将 `skill/` 目录复制到 OpenClaw 的 skills 目录，让 Agent 获得控制洞洞板面板的能力：
+将 `skill/` 目录复制到 Agent 的 skills 目录，让 Agent 获得控制洞洞板面板的能力：
 
 ```bash
-cp -r skill/ <openclaw-skills-dir>/pegboard
+cp -r skill/ <your-agent-skills-dir>/pegboard
 ```
 
 > **Agent 兼容性现状**
 >
-> - **Skill（面板控制）**：通用 —— 任何能执行 skill 脚本的 Agent 都可以控制面板（Claude Code、OpenClaw 等）。
+> - **Skill（面板控制）**：通用 —— 任何能执行 skill 脚本（零依赖 Node）的 Agent 都可以控制面板。
 > - **聊天对话**：当前重点支持 **Claude Code**（经 claude-bridge，见下文）。
-> - **OpenClaw channel 模式**：仅适配**旧版 OpenClaw** 的 channel 协议，新版 OpenClaw 尚未适配。
 > - 其他 Agent 的对话接入待后续开发。
 
 ### 配合 Claude Code 使用
@@ -132,7 +130,7 @@ node claude-bridge/index.mjs
 回传聊天栏。面板操作由 Claude Code 通过 skill
 脚本直接完成。会话在 24 小时内可跨桥接器重启延续。
 
-**不要同时运行桥接器和 OpenClaw channel 插件** —— 两者消费同样的聊天消息，
+**同一时间只运行一个聊天桥接器** —— 两个消费者消费同样的聊天消息，
 会出现两份交错回复。
 
 环境变量配置：
@@ -147,22 +145,10 @@ node claude-bridge/index.mjs
 
 如果只在交互式 Claude Code 会话中控制面板（不用聊天栏），只装 skill 即可。
 
-### 安装 OpenClaw Channel 插件（可选，仅适配旧版 OpenClaw —— 勿与 claude-bridge 同时运行）
-
-**注意：当前 channel 插件只兼容旧版 OpenClaw 的 channel 模式，新版 OpenClaw 尚未适配。** 聊天对话推荐使用上文的 Claude Code 桥接器。
-
-`channel-adapter/` 目录包含一个 OpenClaw channel 插件，用于桥接 Agent 和洞洞板之间的 WebSocket 连接。如果你的部署需要专用 channel，可以安装它：
-
-```bash
-cp -r channel-adapter/ <openclaw-plugins-dir>/pegboard
-```
-
-如果不安装，也可以直接告诉 Agent 连接洞洞板 —— 它会自动读取 `~/.pegboard/config/ws-token.json` 中的 token 并建立 WebSocket 连接。
-
 ## 工作原理
 
 1. **洞洞板启动** —— WS 服务器监听 `:9800`，认证 token 写入 `~/.pegboard/config/ws-token.json`
-2. **Agent 连接** —— claude-bridge 或 OpenClaw channel 插件读取 token，建立持久 WebSocket 连接
+2. **Agent 连接** —— claude-bridge 读取 token，建立持久 WebSocket 连接
 3. **你发消息** —— 按 `⌘J`，输入消息，经 WS 转发至 Agent
 4. **Agent 响应** —— 流式回复文字，同时调用 Skill 工具创建/更新面板
 5. **画布更新** —— 面板实时出现、重排、更新
