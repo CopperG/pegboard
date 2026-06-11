@@ -20,6 +20,8 @@
   "sort": "Sort",
   "send": "Send",
   "items_count": "{{count}} panels",
+  "select_all": "Select all",
+  "completed_count": "{{done}}/{{total}} done",
   "drop_files_here": "Drop files here",
   "unsupported_file": "Unsupported file type",
   "file_too_large": "File too large (max {{max}}MB)",
