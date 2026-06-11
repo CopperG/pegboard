@@ -56,5 +56,9 @@
   "view_week": "周",
   "view_month": "月",
   "words_count": "{{count}} 字",
-  "category": "分类"
+  "category": "分类",
+  "double_click_to_edit": "双击编辑",
+  "content_changed_externally": "内容刚被 Agent 更新，保存将覆盖更新",
+  "load_latest": "加载最新内容",
+  "edit_shortcuts_hint": "Esc 取消 · Ctrl/Cmd+Enter 保存"
 }

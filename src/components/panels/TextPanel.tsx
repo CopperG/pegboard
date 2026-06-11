@@ -1,10 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, useState, useRef, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
+import { invoke } from '@tauri-apps/api/core'
+import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { PanelProps } from './PanelRegistry'
+import { useCanvasStore, selectPanelInteraction } from '@/stores/canvas-store'
 
 interface TocEntry {
   level: number
@@ -36,11 +39,21 @@ export function parseTocFromContent(content: string): TocEntry[] {
     const text = match[2]!.trim()
     const id = text
       .toLowerCase()
-      .replace(/[^\w\u4e00-\u9fff]+/g, '-')
+      .replace(/[^\w一-鿿]+/g, '-')
       .replace(/^-|-$/g, '')
     entries.push({ level, text, id })
   }
   return entries
+}
+
+/** Mixed CJK/latin word count: CJK chars count individually, latin runs count per word */
+export function countWords(content: string): number {
+  const cjk = (content.match(/[一-鿿]/g) ?? []).length
+  const latinWords = content
+    .replace(/[一-鿿]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length
+  return cjk + latinWords
 }
 
 /** Custom rehype plugin to add IDs to headings for anchor navigation */
@@ -67,7 +80,7 @@ function visitHeadings(node: unknown) {
       const text = extractText(el)
       const id = text
         .toLowerCase()
-        .replace(/[^\w\u4e00-\u9fff]+/g, '-')
+        .replace(/[^\w一-鿿]+/g, '-')
         .replace(/^-|-$/g, '')
       el.properties = { ...el.properties, id }
     }
@@ -181,12 +194,68 @@ export function TocNavBar({
 // ── TextPanel (main) ────────────────────────────────────────────────
 export function TextPanel({ data, panelId }: PanelProps) {
   const { t } = useTranslation('panels')
+  const { t: tCommon } = useTranslation('common')
+
+  const interaction = useCanvasStore(selectPanelInteraction(panelId))
+  const editable = interaction?.editable ?? false
 
   // Safely cast / validate data
   const panelData: TextPanelData | null = useMemo(() => {
     if (isTextPanelData(data)) return data
     return null
   }, [data])
+
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState('')
+  // Snapshot at edit start — detects external (agent) changes during the edit session
+  const baseContentRef = useRef('')
+
+  const startEdit = useCallback(() => {
+    if (!editable || !panelData) return
+    baseContentRef.current = panelData.content
+    setDraft(panelData.content)
+    setEditing(true)
+  }, [editable, panelData])
+
+  const cancelEdit = useCallback(() => setEditing(false), [])
+
+  const loadLatest = useCallback(() => {
+    if (!panelData) return
+    baseContentRef.current = panelData.content
+    setDraft(panelData.content)
+  }, [panelData])
+
+  const saveEdit = useCallback(() => {
+    const newContent = draft
+    if (newContent === baseContentRef.current) {
+      setEditing(false)
+      return
+    }
+
+    // Merge against FRESH store data: only content is replaced, derived fields recomputed,
+    // everything else (summary, format) preserved — prevents stale-copy overwrites
+    const store = useCanvasStore.getState()
+    const panel = store.panels.find((p) => p.panelId === panelId)
+    if (panel && panel.data && typeof panel.data === 'object') {
+      const fresh = panel.data as TextPanelData
+      const next: TextPanelData = { ...fresh, content: newContent }
+      if (fresh.toc !== undefined) next.toc = parseTocFromContent(newContent)
+      if (fresh.wordCount !== undefined) next.wordCount = countWords(newContent)
+      store.updatePanel(panelId, next)
+    }
+
+    invoke('send_ws_message', {
+      message: JSON.stringify({
+        type: 'panel_user_action',
+        action: 'edit_value',
+        panelId,
+        payload: { field: 'content', newValue: newContent },
+        timestamp: new Date().toISOString(),
+      }),
+    }).catch(console.error)
+
+    setEditing(false)
+  }, [draft, panelId])
 
   if (!panelData) {
     return (
@@ -196,9 +265,62 @@ export function TextPanel({ data, panelId }: PanelProps) {
     )
   }
 
+  // Agent pushed new content while the user is editing
+  const externallyChanged = editing && panelData.content !== baseContentRef.current
+
+  if (editing) {
+    return (
+      <div className="flex flex-col h-full gap-2" data-no-drag>
+        {externallyChanged && (
+          <div className="flex items-center gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-1.5 text-xs shrink-0">
+            <span className="flex-1">{t('content_changed_externally')}</span>
+            <button
+              type="button"
+              className="underline underline-offset-2 hover:text-primary shrink-0"
+              onClick={loadLatest}
+            >
+              {t('load_latest')}
+            </button>
+          </div>
+        )}
+        <textarea
+          autoFocus
+          className="flex-1 w-full resize-none rounded-md border bg-background p-2 text-[13px] leading-relaxed outline-none focus:ring-2 focus:ring-primary/50"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              e.preventDefault()
+              cancelEdit()
+            }
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault()
+              saveEdit()
+            }
+          }}
+        />
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] text-muted-foreground mr-auto">
+            {t('edit_shortcuts_hint')}
+          </span>
+          <Button variant="ghost" size="sm" onClick={cancelEdit}>
+            {tCommon('cancel')}
+          </Button>
+          <Button size="sm" onClick={saveEdit}>
+            {tCommon('save')}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative h-full">
-      <div className="h-full overflow-y-auto">
+      <div
+        className={`h-full overflow-y-auto ${editable ? 'cursor-text' : ''}`}
+        title={editable ? t('double_click_to_edit') : undefined}
+        onDoubleClick={editable ? startEdit : undefined}
+      >
         {/* Optional metadata line */}
         {(panelData.wordCount != null || panelData.summary) && (
           <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
