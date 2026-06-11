@@ -198,7 +198,7 @@ export function TextPanel({ data, panelId }: PanelProps) {
 
   return (
     <div className="relative h-full">
-      <div>
+      <div className="h-full overflow-y-auto">
         {/* Optional metadata line */}
         {(panelData.wordCount != null || panelData.summary) && (
           <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
