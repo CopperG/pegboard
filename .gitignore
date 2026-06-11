@@ -1,28 +1,43 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 src-tauri/target/
-.DS_Store
-*.log
-.env
-.env.local
+coverage/
+output/
+
+# Generated
 *.tsbuildinfo
+vite.config.d.ts
+testcase.md
+.turbo/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+*.local
 *.pem
 *.key
 config/secrets.yml
-docs/*
-!docs/screenshots/
-!docs/superpowers/
-# Claude Code
+
+# Logs
+*.log
+
+# Editor / IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local-only docs and tooling
 .claude/
 CLAUDE.md
-
-# Design docs
+MEMORY.md
+docs/*
+!docs/screenshots/
 .interface-design/
-
-# Generated
-vite.config.d.ts
-output/
-testcase.md
-*.local
-.turbo/
-coverage/
