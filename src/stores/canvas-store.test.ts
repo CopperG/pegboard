@@ -1,21 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { useCanvasStore } from '@/stores/canvas-store'
 import { resetCanvasStore } from '@/test/store-utils'
-import type { PanelMessage } from '@/types/panel-protocol'
-
-export function makePanelMessage(overrides: Partial<PanelMessage> = {}): PanelMessage {
-  return {
-    action: 'create',
-    panelId: 'p1',
-    pinned: false,
-    zone: 'right',
-    panelType: 'text',
-    title: 'Test',
-    size: 'md',
-    data: { summary: 's', content: 'hello', format: 'markdown' },
-    ...overrides,
-  }
-}
+import { makePanelMessage } from '@/test/fixtures'
 
 describe('canvas-store', () => {
   beforeEach(() => resetCanvasStore())

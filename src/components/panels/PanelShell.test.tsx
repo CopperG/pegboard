@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import { PanelShell } from '@/components/panels/PanelShell'
 import { useCanvasStore } from '@/stores/canvas-store'
 import { resetCanvasStore } from '@/test/store-utils'
-import { makePanelMessage } from '@/stores/canvas-store.test'
+import { makePanelMessage } from '@/test/fixtures'
 
 describe('PanelShell', () => {
   beforeEach(() => resetCanvasStore())
