@@ -84,7 +84,7 @@ export async function handlePegboardMessage(params: HandlePegboardMessageParams)
       const transient = canvasState.transientPanels as { id?: string; type?: string; title?: string }[];
 
       for (const p of pinned) {
-        lines.push(`  📌 [${p.type}] "${p.title}" (id: ${p.id}, size: ${p.size})`);
+        lines.push(`  [pinned] [${p.type}] "${p.title}" (id: ${p.id}, size: ${p.size})`);
       }
       for (const p of transient) {
         lines.push(`  · [${p.type}] "${p.title}" (id: ${p.id})`);

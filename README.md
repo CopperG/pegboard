@@ -17,12 +17,6 @@ AI agent calls tools. Panels appear. Data visualized. No manual UI work.
 
 ---
 
-<p align="center">
-  <img src="docs/screenshots/light.png" width="32%" alt="Light Theme" />
-  <img src="docs/screenshots/dark.png" width="32%" alt="Dark Theme" />
-  <img src="docs/screenshots/system.png" width="32%" alt="System Theme" />
-</p>
-
 ## What is Pegboard?
 
 Think of a real pegboard — the kind you hang on a wall. You can mount anything: tools, shelves, hooks, containers. Pegboard brings this concept to your desktop, but for **AI-generated content**.
@@ -102,7 +96,46 @@ Copy the `skill/` directory to your OpenClaw skills folder so the agent can cont
 cp -r skill/ <openclaw-skills-dir>/pegboard
 ```
 
-### Install the Channel Plugin (optional)
+### Use with Claude Code
+
+Pegboard works with [Claude Code](https://claude.com/claude-code) out of the box.
+
+1. Install the skill so Claude Code can control panels:
+
+```bash
+cp -r skill/ ~/.claude/skills/pegboard
+```
+
+2. Start the chat bridge so messages typed in Pegboard's chat bar reach Claude Code:
+
+```bash
+node claude-bridge/index.mjs
+# or install it as a launchd agent (auto-start, auto-restart):
+./claude-bridge/install-launchd.sh
+```
+
+The bridge requires **Node >= 22** (it uses the global `WebSocket`). It keeps
+one persistent `claude` process alive (streaming JSON in/out), forwards each
+chat message as a turn, and streams the reply back to the chat bar. Panel tool calls are made by Claude Code itself through the skill scripts.
+Sessions survive bridge restarts within 24 hours.
+
+**Do not run the bridge and the OpenClaw channel plugin at the same time** —
+both consume the same chat messages and you will get two interleaved replies.
+
+Configuration (env vars):
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `PEGBOARD_CLAUDE_BIN` | `claude` | Claude Code binary |
+| `PEGBOARD_CLAUDE_ALLOWED_TOOLS` | `Skill(pegboard),Bash(node <skills>/pegboard/scripts/*),Read` | `--allowedTools` value, passed as one argument. The default is scoped to the skill scripts; widen to `Bash(node:*)` (permits arbitrary node code) only if you need it |
+| `PEGBOARD_CLAUDE_FLAGS` | (empty) | Extra misc CLI flags, space-separated (do not put `--allowedTools` here) |
+| `PEGBOARD_CLAUDE_CWD` | `$HOME` | Working directory for the agent |
+| `PEGBOARD_CLAUDE_TIMEOUT_MS` | `600000` | Per-turn timeout |
+
+If you only need panel control from an interactive Claude Code session
+(no chat bar), installing the skill alone is enough.
+
+### Install the OpenClaw Channel Plugin (optional, OpenClaw only — do not combine with claude-bridge)
 
 The `channel-adapter/` directory contains an OpenClaw channel plugin that bridges the WebSocket connection between the agent and Pegboard. Install it if your setup requires a dedicated channel:
 

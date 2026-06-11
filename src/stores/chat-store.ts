@@ -12,15 +12,10 @@ export const useChatStore = create<ChatStore>()(
         state.messages.push(msg)
       }),
 
-    appendToLastMessage: (content: string) =>
+    appendToMessage: (id: string, content: string) =>
       set((state) => {
-        // Find the last agent message and append content to it
-        for (let i = state.messages.length - 1; i >= 0; i--) {
-          if (state.messages[i]!.role === 'agent') {
-            state.messages[i]!.content += content
-            break
-          }
-        }
+        const msg = state.messages.find((m) => m.id === id)
+        if (msg) msg.content += content
       }),
 
     setStreaming: (val: boolean) =>

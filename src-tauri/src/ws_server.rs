@@ -5,19 +5,34 @@
 // Supports: token auth, canvas state queries, streaming passthrough
 
 use futures_util::{SinkExt, StreamExt};
+use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Instant;
 use tauri::{AppHandle, Emitter};
 use tokio::net::TcpListener;
-use tokio::sync::{broadcast, Mutex, RwLock};
+use tokio::sync::{mpsc, Mutex, RwLock};
 use tokio_tungstenite::tungstenite::handshake::server::{ErrorResponse, Request, Response};
 use tokio_tungstenite::tungstenite::http;
 use tokio_tungstenite::tungstenite::protocol::WebSocketConfig;
 use tokio_tungstenite::tungstenite::Message;
 
+/// Per-client bounded queue size. A client this far behind (1024 messages)
+/// is dead or stuck; we drop it explicitly instead of silently losing
+/// messages (the old broadcast::Lagged behavior).
+pub const CLIENT_QUEUE_CAPACITY: usize = 1024;
+
+/// Compare without early exit so timing does not leak the match length.
+fn constant_time_eq(a: &str, b: &str) -> bool {
+    if a.len() != b.len() {
+        return false;
+    }
+    a.bytes().zip(b.bytes()).fold(0u8, |acc, (x, y)| acc | (x ^ y)) == 0
+}
+
 // Shared state for connected clients
 pub struct WsState {
-    pub tx: broadcast::Sender<String>,
+    clients: RwLock<HashMap<u64, mpsc::Sender<String>>>,
+    next_id: std::sync::atomic::AtomicU64,
     /// Timestamp of last successful client connection (epoch millis)
     pub last_connected_at: RwLock<Option<u64>>,
     /// Total number of connections since server start
@@ -26,12 +41,63 @@ pub struct WsState {
 
 impl WsState {
     pub fn new() -> Self {
-        let (tx, _) = broadcast::channel(100);
         Self {
-            tx,
+            clients: RwLock::new(HashMap::new()),
+            next_id: std::sync::atomic::AtomicU64::new(1),
             last_connected_at: RwLock::new(None),
             total_connections: std::sync::atomic::AtomicU32::new(0),
         }
+    }
+
+    pub async fn register(&self) -> (u64, mpsc::Receiver<String>) {
+        let (tx, rx) = mpsc::channel(CLIENT_QUEUE_CAPACITY);
+        let id = self.next_id.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+        self.clients.write().await.insert(id, tx);
+        (id, rx)
+    }
+
+    pub async fn unregister(&self, id: u64) {
+        self.clients.write().await.remove(&id);
+    }
+
+    pub async fn client_count(&self) -> usize {
+        self.clients.read().await.len()
+    }
+
+    /// Deliver to every connected client. Returns the number of successful
+    /// deliveries.
+    ///
+    /// Backpressure contract (spans this method and `handle_connection`):
+    /// a client whose bounded queue is Full (too far behind) or already Closed
+    /// is removed from `clients` here, which drops its `mpsc::Sender`. That
+    /// causes the matching per-connection send loop (`rx.recv()` in
+    /// `handle_connection`) to observe channel close, break, and tear down the
+    /// socket. So "removed from the map here" is the single trigger that ends
+    /// the connection — no message is silently lost the way `broadcast::Lagged`
+    /// used to drop them.
+    pub async fn send_to_all(&self, msg: &str) -> usize {
+        let mut stale: Vec<u64> = Vec::new();
+        let mut delivered = 0usize;
+        {
+            let clients = self.clients.read().await;
+            for (id, tx) in clients.iter() {
+                match tx.try_send(msg.to_string()) {
+                    Ok(()) => delivered += 1,
+                    Err(mpsc::error::TrySendError::Full(_)) => {
+                        log::warn!("WS client {} backlog full ({}), dropping client", id, CLIENT_QUEUE_CAPACITY);
+                        stale.push(*id);
+                    }
+                    Err(mpsc::error::TrySendError::Closed(_)) => stale.push(*id),
+                }
+            }
+        }
+        if !stale.is_empty() {
+            let mut clients = self.clients.write().await;
+            for id in stale {
+                clients.remove(&id);
+            }
+        }
+        delivered
     }
 }
 
@@ -114,7 +180,7 @@ async fn handle_connection(
 
         if !token_expected.is_empty() {
             match url_token {
-                Some(t) if t == token_expected => {
+                Some(t) if constant_time_eq(t, &token_expected) => {
                     log::info!("WS auth accepted");
                     Ok(response)
                 }
@@ -157,15 +223,15 @@ async fn handle_connection(
     );
 
     let (write, mut read) = ws_stream.split();
-    let mut rx = ws_state.tx.subscribe();
+    let (client_id, mut rx) = ws_state.register().await;
 
     // Wrap write in Arc<Mutex> for sharing between read and send tasks
     let write = Arc::new(Mutex::new(write));
     let write_clone = write.clone();
 
-    // Task: Forward messages from broadcast channel to this client
+    // Task: forward this client's queued messages to the socket
     let send_task = tokio::spawn(async move {
-        while let Ok(msg) = rx.recv().await {
+        while let Some(msg) = rx.recv().await {
             let mut w = write_clone.lock().await;
             if w.send(Message::Text(msg.into())).await.is_err() {
                 break;
@@ -283,6 +349,8 @@ async fn handle_connection(
         _ = read_task => {},
     }
 
+    ws_state.unregister(client_id).await;
+
     // Notify frontend of disconnection
     let _ = app_handle.emit(
         "ws-status-change",
@@ -290,4 +358,42 @@ async fn handle_connection(
             "status": "disconnected"
         }),
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn token_compare() {
+        assert!(constant_time_eq("abc123", "abc123"));
+        assert!(!constant_time_eq("abc123", "abc124"));
+        assert!(!constant_time_eq("abc", "abc123"));
+        assert!(!constant_time_eq("", "a"));
+        assert!(constant_time_eq("", ""));
+    }
+
+    #[tokio::test]
+    async fn mpsc_register_send_unregister() {
+        let state = WsState::new();
+        let (id, mut rx) = state.register().await;
+        assert_eq!(state.send_to_all("hello").await, 1);
+        assert_eq!(rx.recv().await.unwrap(), "hello");
+        state.unregister(id).await;
+        assert_eq!(state.send_to_all("x").await, 0);
+        assert_eq!(state.client_count().await, 0);
+    }
+
+    #[tokio::test]
+    async fn mpsc_drops_client_with_full_backlog() {
+        let state = WsState::new();
+        let (_id, _rx) = state.register().await;
+        // Fill the bounded queue without draining rx
+        for i in 0..CLIENT_QUEUE_CAPACITY {
+            assert_eq!(state.send_to_all(&format!("m{}", i)).await, 1);
+        }
+        // One more: queue full -> client dropped
+        assert_eq!(state.send_to_all("overflow").await, 0);
+        assert_eq!(state.client_count().await, 0);
+    }
 }
