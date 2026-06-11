@@ -11,6 +11,7 @@ import { LayoutGrid, Star, Clock, Briefcase, Gamepad2, MoreHorizontal, PanelLeft
 import { ArchiveDrawer } from '@/components/canvas/ArchiveDrawer'
 import { ConnectionDot } from '@/components/layout/Sidebar'
 import { SettingsMenu } from '@/components/layout/Sidebar'
+import { BridgeToggle } from '@/components/layout/BridgeToggle'
 
 const TAB_KEYS: Record<CanvasView, string> = {
   important: 'important',
@@ -212,6 +213,10 @@ export function CanvasTabs({ sidebarOpen, onToggleSidebar, chatOpen, onToggleCha
 
         <div className="relative group flex items-center justify-center w-9 h-9">
           <ConnectionDot />
+        </div>
+
+        <div className="relative group flex items-center justify-center w-9 h-9">
+          <BridgeToggle />
         </div>
 
         <div className="relative group flex items-center justify-center w-9 h-9">

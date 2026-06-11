@@ -1,8 +1,10 @@
+mod bridge;
 mod commands;
 mod fs_ops;
 mod ws_server;
 
 use std::sync::Arc;
+use tauri::Manager;
 use tokio::sync::RwLock;
 use ws_server::WsState;
 
@@ -27,6 +29,7 @@ pub fn run() {
         .manage(CanvasState(canvas_state.clone()))
         .manage(PanelsDataCache(panels_data.clone()))
         .manage(WsToken(ws_token.clone()))
+        .manage(bridge::BridgeState::new())
         .invoke_handler(tauri::generate_handler![
             commands::send_ws_message,
             commands::get_ws_status,
@@ -48,6 +51,9 @@ pub fn run() {
             commands::get_template,
             commands::delete_template,
             commands::import_template,
+            bridge::start_bridge,
+            bridge::stop_bridge,
+            bridge::bridge_status,
         ])
         .setup(move |app| {
             // Ensure data directories exist on startup
@@ -109,6 +115,15 @@ pub fn run() {
 
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| {
+            // Kill the app-managed claude-bridge child on exit so it never
+            // orphans into a second WS consumer (would cause double replies).
+            if let tauri::RunEvent::Exit = event {
+                if let Some(state) = app_handle.try_state::<bridge::BridgeState>() {
+                    let _ = bridge::stop(&state);
+                }
+            }
+        });
 }

@@ -7,11 +7,6 @@ import { useAudioRecorder } from '@/hooks/useAudioRecorder'
 import { useFileUpload } from '@/hooks/useFileUpload'
 import { ChatMessage } from './ChatMessage'
 import { Button } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import { getPanelIcon } from '@/lib/panel-icons'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -517,67 +512,58 @@ export function ChatFloatingBar({ open, onClose }: { open: boolean; onClose: () 
             <Paperclip className="w-4 h-4" />
           </Button>
 
-          {/* Input with @ autocomplete popover */}
-          <Popover
-            open={autocompleteOpen}
-            onOpenChange={(open) => {
-              if (!open) closeAutocomplete()
-            }}
-          >
-            <PopoverTrigger
-              render={<div className="flex-1" />}
-              nativeButton={false}
-            >
-              <input
-                ref={inputIMERef}
-                type="text"
-                value={value}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
-                placeholder={t('input_placeholder')}
-                className="w-full h-8 px-3 text-sm bg-muted/50 border border-border rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50 placeholder:text-muted-foreground"
-              />
-            </PopoverTrigger>
-            <PopoverContent
-              side="top"
-              align="start"
-              sideOffset={8}
-              className="w-[min(18rem,calc(100vw-2rem))] max-h-48 overflow-y-auto p-1"
-            >
-              {filteredPanels.length === 0 ? (
-                <div className="text-sm text-muted-foreground px-2 py-1.5">
-                  {t('no_matching_panels')}
-                </div>
-              ) : (
-                filteredPanels.map((panel, idx) => (
-                  <button
-                    key={panel.panelId}
-                    type="button"
-                    className={cn(
-                      'w-full text-left px-2 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors',
-                      idx === autocompleteIndex
-                        ? 'bg-accent text-accent-foreground'
-                        : 'hover:bg-muted',
-                    )}
-                    onMouseEnter={() => setAutocompleteIndex(idx)}
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      selectPanel(panel)
-                    }}
-                  >
-                    <span className="text-muted-foreground shrink-0">
-                      {getPanelIcon(panel.panelType)}
-                    </span>
-                    <span className="flex-1 truncate">{panel.title}</span>
-                    <span className="text-xs text-muted-foreground font-mono">
-                      {panel.panelId.slice(0, 8)}
-                    </span>
-                  </button>
-                ))
-              )}
-            </PopoverContent>
-          </Popover>
+          {/* Input with @ autocomplete dropdown.
+              Plain absolutely-positioned dropdown (a sibling of the input),
+              NOT a base-ui Popover: a Popover steals focus from the input on
+              open and portals out of the chat window's stacking context, which
+              broke @-mention typing. A sibling dropdown keeps input focus. */}
+          <div className="relative flex-1">
+            <input
+              ref={inputIMERef}
+              type="text"
+              value={value}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+              placeholder={t('input_placeholder')}
+              className="w-full h-8 px-3 text-sm bg-muted/50 border border-border rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring/50 placeholder:text-muted-foreground"
+            />
+            {autocompleteOpen && (
+              <div className="absolute bottom-full left-0 mb-2 w-[min(18rem,calc(100vw-2rem))] max-h-48 overflow-y-auto p-1 rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 z-50">
+                {filteredPanels.length === 0 ? (
+                  <div className="text-sm text-muted-foreground px-2 py-1.5">
+                    {t('no_matching_panels')}
+                  </div>
+                ) : (
+                  filteredPanels.map((panel, idx) => (
+                    <button
+                      key={panel.panelId}
+                      type="button"
+                      className={cn(
+                        'w-full text-left px-2 py-1.5 rounded-md text-sm flex items-center gap-2 transition-colors',
+                        idx === autocompleteIndex
+                          ? 'bg-accent text-accent-foreground'
+                          : 'hover:bg-muted',
+                      )}
+                      onMouseEnter={() => setAutocompleteIndex(idx)}
+                      onMouseDown={(e) => {
+                        e.preventDefault()
+                        selectPanel(panel)
+                      }}
+                    >
+                      <span className="text-muted-foreground shrink-0">
+                        {getPanelIcon(panel.panelType)}
+                      </span>
+                      <span className="flex-1 truncate">{panel.title}</span>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {panel.panelId.slice(0, 8)}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Recording button */}
           <Button
