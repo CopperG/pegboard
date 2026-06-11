@@ -56,6 +56,10 @@ export const panelControlTool = {
         type: "string",
         description: "自定义 CSS 样式 (配合 html 使用)",
       },
+      interaction: {
+        type: "object",
+        description: "交互配置: {sortable?,filterable?} (table) / {checkable?} (list,timeline) / {editable?} (kv,text)",
+      },
       patch: {
         type: "array",
         description: "JSON Patch 数组 (action=update 时的增量更新)",
@@ -143,6 +147,11 @@ export async function execute(params) {
   // Add tags for create/setTags
   if (params.tags !== undefined) {
     panelPayload.tags = params.tags
+  }
+
+  // Add interaction config for create/update (checkable/editable/sortable/filterable)
+  if (params.interaction !== undefined) {
+    panelPayload.interaction = params.interaction
   }
 
   // Add resize fields
