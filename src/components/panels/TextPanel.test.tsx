@@ -107,6 +107,21 @@ describe('TextPanel double-click editing', () => {
     expect(vi.mocked(invoke).mock.calls.filter((c) => c[0] === 'send_ws_message')).toHaveLength(0)
   })
 
+  it('keeps the editor and draft when agent pushes malformed data mid-edit', async () => {
+    seedEditablePanel()
+    const { rerender } = render(<TextPanel panelId="tp1" size="md" data={textData} />)
+    await userEvent.dblClick(screen.getByText('original body'))
+    await userEvent.type(screen.getByRole('textbox'), ' plus my edit')
+
+    const malformed = { summary: 'broken' } // fails isTextPanelData (no content string)
+    useCanvasStore.getState().updatePanel('tp1', malformed)
+    rerender(<TextPanel panelId="tp1" size="md" data={malformed} />)
+
+    const box = screen.getByRole('textbox')
+    expect(box).toBeInTheDocument()
+    expect((box as HTMLTextAreaElement).value).toContain('plus my edit')
+  })
+
   it('shows conflict banner on external update while editing, load latest refreshes draft', async () => {
     seedEditablePanel()
     const { rerender } = render(<TextPanel panelId="tp1" size="md" data={textData} />)

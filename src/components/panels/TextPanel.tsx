@@ -257,16 +257,9 @@ export function TextPanel({ data, panelId }: PanelProps) {
     setEditing(false)
   }, [draft, panelId])
 
-  if (!panelData) {
-    return (
-      <div className="p-4 text-sm text-muted-foreground">
-        {t('cannot_render', { type: t('text') })}: {t('invalid_data')} (panelId: {panelId})
-      </div>
-    )
-  }
-
-  // Agent pushed new content while the user is editing
-  const externallyChanged = editing && panelData.content !== baseContentRef.current
+  // Agent pushed new content while the user is editing.
+  // null-guard: panelData may be null (malformed update) while editing — treat as not changed.
+  const externallyChanged = editing && panelData != null && panelData.content !== baseContentRef.current
 
   if (editing) {
     return (
@@ -310,6 +303,14 @@ export function TextPanel({ data, panelId }: PanelProps) {
             {tCommon('save')}
           </Button>
         </div>
+      </div>
+    )
+  }
+
+  if (!panelData) {
+    return (
+      <div className="p-4 text-sm text-muted-foreground">
+        {t('cannot_render', { type: t('text') })}: {t('invalid_data')} (panelId: {panelId})
       </div>
     )
   }

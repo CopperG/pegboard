@@ -59,6 +59,6 @@
   "category": "Category",
   "double_click_to_edit": "Double-click to edit",
   "content_changed_externally": "Content was just updated by the agent; saving will overwrite it",
-  "load_latest": "Load latest",
+  "load_latest": "Load latest (discards my edits)",
   "edit_shortcuts_hint": "Esc to cancel, Ctrl/Cmd+Enter to save"
 }
