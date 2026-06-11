@@ -14,9 +14,11 @@ export function useRelativeTime(isoTime: string | undefined): {
   const [, setTick] = useState(0)
 
   useEffect(() => {
+    // No timer when there is nothing to display; starts when isoTime first appears
+    if (!isoTime) return
     const timer = setInterval(() => setTick((n) => n + 1), REFRESH_MS)
     return () => clearInterval(timer)
-  }, [])
+  }, [isoTime])
 
   if (!isoTime) return { relative: '', absolute: '' }
   const date = new Date(isoTime)

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar'
 import { format, parse, startOfWeek, getDay } from 'date-fns'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
-import { invoke } from '@tauri-apps/api/core'
-import { useCanvasStore, selectPanelInteraction } from '@/stores/canvas-store'
+import { useCanvasStore, selectPanelInteraction, updatePanelData } from '@/stores/canvas-store'
+import { sendPanelUserAction } from '@/lib/ws-protocol'
 import type { PanelProps } from './PanelRegistry'
 import type { TimelinePanelData } from '@/types/panel-data'
 
@@ -152,7 +152,7 @@ function DayTimelineView({
     )
   }
 
-  const checkedCount = sorted.filter((e) => e.checked).length
+  const checkedCount = checkable ? sorted.filter((e) => e.checked).length : 0
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
@@ -305,27 +305,13 @@ export function TimelinePanel({ panelId, data }: PanelProps) {
   const handleCheck = useCallback(
     (eventId: string, checked: boolean) => {
       // Optimistic update: checked state lives in panel.data (single source of truth, persisted)
-      const store = useCanvasStore.getState()
-      const panel = store.panels.find((p) => p.panelId === panelId)
-      if (panel && panel.data && typeof panel.data === 'object') {
-        const d = panel.data as TimelinePanelData
-        store.updatePanel(panelId, {
-          ...d,
-          events: d.events.map((e) =>
-            e.id === eventId ? { ...e, checked } : e,
-          ),
-        })
-      }
-
-      invoke('send_ws_message', {
-        message: JSON.stringify({
-          type: 'panel_user_action',
-          action: 'check_item',
-          panelId,
-          payload: { itemId: eventId, checked },
-          timestamp: new Date().toISOString(),
-        }),
-      }).catch(console.error)
+      updatePanelData<TimelinePanelData>(panelId, (d) => ({
+        ...d,
+        events: d.events.map((e) =>
+          e.id === eventId ? { ...e, checked } : e,
+        ),
+      }))
+      sendPanelUserAction(panelId, 'check_item', { itemId: eventId, checked })
     },
     [panelId],
   )

@@ -10,7 +10,7 @@ import type { CanvasStateSnapshot, PanelSummary } from '@/types/websocket'
 import { BUILTIN_THEMES } from '@/hooks/useTheme'
 import { DEFAULT_GRID_CONFIG, CATEGORY_TAGS, CANVAS_VIEW_ORDER, normalizeTags } from '@/types/layout'
 import { applyJsonPatch, validatePatchSafety } from '@/lib/json-patch'
-import { validatePanelData } from '@/lib/panel-validators'
+import { validatePanelData, hasPanelDataSchema } from '@/lib/panel-validators'
 import type { Operation } from 'fast-json-patch'
 
 const AVAILABLE_PLUGINS = [
@@ -258,6 +258,15 @@ export const useCanvasStore = create<CanvasStore>()(
       set((state) => {
         const panel = state.panels.find((p) => p.panelId === panelId)
         if (panel) {
+          // Advisory only (mirrors createPanel): warn on shape mismatch, store verbatim
+          if (hasPanelDataSchema(panel.panelType)) {
+            const validation = validatePanelData(panel.panelType, data)
+            if (!validation.success) {
+              console.warn(
+                `[canvas-store] Panel data validation failed on update for "${panelId}" (${panel.panelType}): ${validation.error}`,
+              )
+            }
+          }
           panel.data = data
           panel.updatedAt = new Date().toISOString()
         }
@@ -630,6 +639,16 @@ export const useCanvasStore = create<CanvasStore>()(
     },
   })),
 )
+
+/** Read a panel's object data, apply fn, and write the result back via updatePanel.
+ *  Shared optimistic-write path for user interactions (checkboxes, inline edits).
+ *  No-op when the panel is missing or its data is not an object. */
+export function updatePanelData<T extends object>(panelId: string, fn: (data: T) => T): void {
+  const store = useCanvasStore.getState()
+  const panel = store.panels.find((p) => p.panelId === panelId)
+  if (!panel || panel.data == null || typeof panel.data !== 'object') return
+  store.updatePanel(panelId, fn(panel.data as T))
+}
 
 // ── Memoized Selectors ──────────────────────────────────────────────
 // Use these instead of inline selectors to avoid unnecessary re-renders.

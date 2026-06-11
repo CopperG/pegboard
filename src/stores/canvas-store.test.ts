@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { useCanvasStore } from '@/stores/canvas-store'
 import { resetCanvasStore } from '@/test/store-utils'
 import { makePanelMessage } from '@/test/fixtures'
@@ -68,6 +68,20 @@ describe('canvas-store', () => {
       interval: 5000,
       maxRetries: 3,
     })
+  })
+
+  it('updatePanel warns on schema mismatch but still stores the data (advisory)', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    try {
+      useCanvasStore.getState().createPanel(makePanelMessage())
+      useCanvasStore.getState().updatePanel('p1', { bogus: true })
+      expect(useCanvasStore.getState().panels[0]!.data).toEqual({ bogus: true })
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining('validation failed on update'),
+      )
+    } finally {
+      warn.mockRestore()
+    }
   })
 
   it('setTags does not bump updatedAt (category is metadata, not panel data)', async () => {

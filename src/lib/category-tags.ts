@@ -1,13 +1,11 @@
-import { CATEGORY_TAGS, normalizeTags } from '@/types/layout'
+import { VALID_CATEGORY_SET, normalizeTags } from '@/types/layout'
 
 /** Category order shown in menus (matches tab order, excludes 'all') */
 export const CATEGORY_ORDER = ['important', 'daily', 'work', 'entertainment', 'other'] as const
 
-const VALID_CATEGORIES = new Set<string>(Object.values(CATEGORY_TAGS))
-
 /** Add a category: clears the auto-fallback 'other' (unless adding 'other'), keeps non-category tags, dedupes */
 export function addCategoryTag(currentTags: string[] | undefined, category: string): string[] {
-  if (!VALID_CATEGORIES.has(category)) return normalizeTags(currentTags)
+  if (!VALID_CATEGORY_SET.has(category)) return normalizeTags(currentTags)
   const rest = (currentTags ?? []).filter((t) => t !== category && t !== 'other')
   return normalizeTags([...rest, category])
 }

@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
-import { invoke } from '@tauri-apps/api/core'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { sendPanelUserAction } from '@/lib/ws-protocol'
 import type { PanelProps } from './PanelRegistry'
-import { useCanvasStore, selectPanelInteraction } from '@/stores/canvas-store'
+import { useCanvasStore, selectPanelInteraction, updatePanelData } from '@/stores/canvas-store'
 
 interface TocEntry {
   level: number
@@ -217,7 +217,7 @@ export function TextPanel({ data, panelId }: PanelProps) {
     setEditing(true)
   }, [editable, panelData])
 
-  const cancelEdit = useCallback(() => setEditing(false), [])
+  const cancelEdit = () => setEditing(false)
 
   const loadLatest = useCallback(() => {
     if (!panelData) return
@@ -234,25 +234,14 @@ export function TextPanel({ data, panelId }: PanelProps) {
 
     // Merge against FRESH store data: only content is replaced, derived fields recomputed,
     // everything else (summary, format) preserved — prevents stale-copy overwrites
-    const store = useCanvasStore.getState()
-    const panel = store.panels.find((p) => p.panelId === panelId)
-    if (panel && panel.data && typeof panel.data === 'object') {
-      const fresh = panel.data as TextPanelData
+    updatePanelData<TextPanelData>(panelId, (fresh) => {
       const next: TextPanelData = { ...fresh, content: newContent }
       if (fresh.toc !== undefined) next.toc = parseTocFromContent(newContent)
       if (fresh.wordCount !== undefined) next.wordCount = countWords(newContent)
-      store.updatePanel(panelId, next)
-    }
+      return next
+    })
 
-    invoke('send_ws_message', {
-      message: JSON.stringify({
-        type: 'panel_user_action',
-        action: 'edit_value',
-        panelId,
-        payload: { field: 'content', newValue: newContent },
-        timestamp: new Date().toISOString(),
-      }),
-    }).catch(console.error)
+    sendPanelUserAction(panelId, 'edit_value', { field: 'content', newValue: newContent })
 
     setEditing(false)
   }, [draft, panelId])

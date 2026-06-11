@@ -1,5 +1,6 @@
 import { z } from 'zod/v4'
-import type { WebSocketMessage } from '@/types/websocket'
+import { invoke } from '@tauri-apps/api/core'
+import type { WebSocketMessage, PanelUserAction } from '@/types/websocket'
 
 const VALID_TYPES = [
   'response', 'panel_action', 'stream_start', 'stream_chunk', 'stream_end',
@@ -40,4 +41,21 @@ export function deserializeMessage(raw: string): WebSocketMessage | null {
   } catch {
     return null
   }
+}
+
+/** Fire-and-forget a panel_user_action message to the WS server (timestamp stamped here) */
+export function sendPanelUserAction(
+  panelId: string,
+  action: PanelUserAction['action'],
+  payload?: Record<string, unknown>,
+): void {
+  invoke('send_ws_message', {
+    message: JSON.stringify({
+      type: 'panel_user_action',
+      action,
+      panelId,
+      ...(payload !== undefined && { payload }),
+      timestamp: new Date().toISOString(),
+    }),
+  }).catch(console.error)
 }

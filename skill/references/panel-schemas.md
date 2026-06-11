@@ -134,7 +134,7 @@
 }
 ```
 
-可用 `action` 值：`pin` | `unpin` | `archive` | `restore` | `close` | `check_item` | `edit_value` | `status_change`
+可用 `action` 值：`pin` | `unpin` | `archive` | `restore` | `close` | `focus` | `check_item` | `edit_value` | `status_change`
 
 各 action 的 payload：
 

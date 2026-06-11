@@ -1,9 +1,9 @@
 import { useMemo, useCallback, useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { List } from 'react-window'
-import { invoke } from '@tauri-apps/api/core'
 import { ChevronRight } from 'lucide-react'
-import { useCanvasStore } from '@/stores/canvas-store'
+import { useCanvasStore, updatePanelData } from '@/stores/canvas-store'
+import { sendPanelUserAction } from '@/lib/ws-protocol'
 import type { PanelProps } from './PanelRegistry'
 
 interface ListBadge {
@@ -212,45 +212,25 @@ export function ListPanel({ panelId, data }: PanelProps) {
   /** Optimistic update: write checked changes back into store panel.data */
   const applyCheckedToStore = useCallback(
     (updates: Map<string, boolean>) => {
-      const store = useCanvasStore.getState()
-      const panel = store.panels.find((p) => p.panelId === panelId)
-      if (!panel || panel.data == null || typeof panel.data !== 'object') return
-      const d = panel.data as ListPanelData
-      store.updatePanel(panelId, {
+      updatePanelData<ListPanelData>(panelId, (d) => ({
         ...d,
         items: d.items.map((i) =>
           updates.has(i.id) ? { ...i, checked: updates.get(i.id)! } : i,
         ),
-      })
+      }))
     },
     [panelId],
   )
 
   const handleNavigate = useCallback((targetPanelId: string) => {
     useCanvasStore.getState().focusPanel(targetPanelId)
-    invoke('send_ws_message', {
-      message: JSON.stringify({
-        type: 'panel_user_action',
-        action: 'focus',
-        panelId: targetPanelId,
-        timestamp: new Date().toISOString(),
-      }),
-    }).catch(console.error)
+    sendPanelUserAction(targetPanelId, 'focus')
   }, [])
 
   const handleCheck = useCallback(
     (itemId: string, checked: boolean) => {
       applyCheckedToStore(new Map([[itemId, checked]]))
-
-      invoke('send_ws_message', {
-        message: JSON.stringify({
-          type: 'panel_user_action',
-          action: 'check_item',
-          panelId,
-          payload: { itemId, checked },
-          timestamp: new Date().toISOString(),
-        }),
-      }).catch(console.error)
+      sendPanelUserAction(panelId, 'check_item', { itemId, checked })
     },
     [panelId, applyCheckedToStore],
   )
@@ -264,15 +244,7 @@ export function ListPanel({ panelId, data }: PanelProps) {
 
     for (const item of panelData.items) {
       if (newChecked !== checkedIds.has(item.id)) {
-        invoke('send_ws_message', {
-          message: JSON.stringify({
-            type: 'panel_user_action',
-            action: 'check_item',
-            panelId,
-            payload: { itemId: item.id, checked: newChecked },
-            timestamp: new Date().toISOString(),
-          }),
-        }).catch(console.error)
+        sendPanelUserAction(panelId, 'check_item', { itemId: item.id, checked: newChecked })
       }
     }
   }, [panelData, panelId, checkedIds, applyCheckedToStore])

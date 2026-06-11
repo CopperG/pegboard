@@ -56,7 +56,7 @@ export interface UserMessage {
 
 export interface PanelUserAction {
   type: 'panel_user_action'
-  action: 'pin' | 'unpin' | 'archive' | 'restore' | 'close' | 'check_item' | 'edit_value' | 'status_change'
+  action: 'pin' | 'unpin' | 'archive' | 'restore' | 'close' | 'focus' | 'check_item' | 'edit_value' | 'status_change'
   panelId: string
   payload?: Record<string, unknown>
   timestamp: string
