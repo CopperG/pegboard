@@ -6,8 +6,10 @@
 
 AI agent calls tools. Panels appear. Data visualized. No manual UI work.
 
+[![Version](https://img.shields.io/badge/Version-v0.1.0-orange)](https://github.com/CopperG/pegboard)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://v2.tauri.app)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-Ready-blueviolet)](https://claude.com/claude-code)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Ready-green)](https://github.com/nicepkg/openclaw)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -106,11 +108,15 @@ Pegboard works with [Claude Code](https://claude.com/claude-code) out of the box
 cp -r skill/ ~/.claude/skills/pegboard
 ```
 
-2. Start the chat bridge so messages typed in Pegboard's chat bar reach Claude Code:
+2. Start the chat bridge so messages typed in Pegboard's chat bar reach Claude Code.
+
+The easiest way: **click the bridge status light in the bottom toolbar** (next to the connection dot). Pegboard spawns and manages the bridge process for you, and kills it on app exit so it never lingers. Click again to stop it.
+
+To run the bridge yourself instead:
 
 ```bash
 node claude-bridge/index.mjs
-# or install it as a launchd agent (auto-start, auto-restart):
+# or install it as a launchd agent (auto-start, auto-restart, 24/7):
 ./claude-bridge/install-launchd.sh
 ```
 
@@ -148,7 +154,7 @@ If not installed, you can tell the agent to connect to Pegboard directly — it 
 ## How It Works
 
 1. **Pegboard starts** — WS server listens on `:9800`, writes auth token to `~/.pegboard/config/ws-token.json`
-2. **OpenClaw connects** — Channel plugin reads the token and establishes a persistent WebSocket connection
+2. **Your agent connects** — claude-bridge or the OpenClaw channel plugin reads the token and establishes a persistent WebSocket connection
 3. **You chat** — Press `⌘J`, type a message. It flows through WS to the agent
 4. **Agent responds** — Streams text back to the chat bar, and calls Skill tools to create/update panels
 5. **Canvas updates** — Panels appear, rearrange, and update in real time
@@ -170,9 +176,22 @@ The floating chat bar (`⌘J`) supports:
 
 ## More Features
 
-- **Panel interactions** — Tables support sorting/filtering, lists support checkboxes; drag panels onto tabs to categorize, drag to sidebar to pin/archive
+- **Edit in place** — Double-click a text panel to edit its Markdown directly; saves are conflict-safe (a banner warns if the agent changed the panel mid-edit, and you choose how to resolve)
+- **Checkable items** — Lists and timeline events have checkboxes; checked state lives in the panel data, survives restarts, and is reported back to the agent
+- **Panel interactions** — Tables support sorting/filtering; drag panels onto tabs to categorize (or change category from the panel actions menu), drag to sidebar to pin/archive
+- **Last-updated time** — Panel headers show a relative "updated X ago" timestamp (hover for the absolute time)
 - **Chat multi-layout** — Full-screen, bottom bar, and floating window modes; file uploads support images/audio/documents (50 MB per file limit)
-- **Agent theme control** — New `theme_control` tool lets agents query/switch themes and register custom theme CSS via WebSocket
+- **Agent theme control** — The `theme_control` tool lets agents query/switch themes and register custom theme CSS via WebSocket
+
+## What's New in v0.1.0
+
+The first tagged release. Highlights:
+
+- **Claude Code integration** — the zero-dependency `claude-bridge/` daemon keeps one persistent `claude` process alive and streams replies into the chat bar. Start/stop it with one click from the bottom toolbar, or install it as a launchd agent for 24/7 operation. Sessions survive bridge restarts within 24 hours.
+- **Editable panels** — double-click text panels to edit Markdown with conflict-safe saves; check off list and timeline items and the agent sees the change.
+- **Panel quality of life** — relative last-updated time in headers, category switching from the actions menu, interaction and realtime config persist across app restarts.
+- **Reliability** — per-client message queues in the WS server (slow clients no longer lose messages), stream chunks routed by `messageId` with an inactivity watchdog, daily snapshots no longer race the state load.
+- **Test infrastructure** — Vitest + Testing Library covering both the frontend (jsdom) and the bridge (node).
 
 ## License
 

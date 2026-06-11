@@ -6,8 +6,10 @@
 
 Agent 调用工具，面板自动生成，数据即时可视化。无需手动搭建 UI。
 
+[![Version](https://img.shields.io/badge/Version-v0.1.0-orange)](https://github.com/CopperG/pegboard)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-blue?logo=tauri)](https://v2.tauri.app)
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react)](https://react.dev)
+[![Claude Code](https://img.shields.io/badge/Claude_Code-Ready-blueviolet)](https://claude.com/claude-code)
 [![OpenClaw](https://img.shields.io/badge/OpenClaw-Ready-green)](https://github.com/nicepkg/openclaw)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -106,11 +108,15 @@ Pegboard 开箱即支持 [Claude Code](https://claude.com/claude-code)。
 cp -r skill/ ~/.claude/skills/pegboard
 ```
 
-2. 启动聊天桥接器，让 Pegboard 聊天栏的消息到达 Claude Code：
+2. 启动聊天桥接器，让 Pegboard 聊天栏的消息到达 Claude Code。
+
+最简单的方式：**点击底部工具栏的桥接状态灯**（连接状态点旁边）。Pegboard 会自动拉起并托管桥接进程，应用退出时一并结束，不会残留。再点一次即可停止。
+
+也可以自己手动运行：
 
 ```bash
 node claude-bridge/index.mjs
-# 或安装为 launchd 常驻服务（开机自启、崩溃自拉）：
+# 或安装为 launchd 常驻服务（开机自启、崩溃自拉、24 小时在线）：
 ./claude-bridge/install-launchd.sh
 ```
 
@@ -147,7 +153,7 @@ cp -r channel-adapter/ <openclaw-plugins-dir>/pegboard
 ## 工作原理
 
 1. **洞洞板启动** —— WS 服务器监听 `:9800`，认证 token 写入 `~/.pegboard/config/ws-token.json`
-2. **OpenClaw 连接** —— Channel 插件读取 token，建立持久 WebSocket 连接
+2. **Agent 连接** —— claude-bridge 或 OpenClaw channel 插件读取 token，建立持久 WebSocket 连接
 3. **你发消息** —— 按 `⌘J`，输入消息，经 WS 转发至 Agent
 4. **Agent 响应** —— 流式回复文字，同时调用 Skill 工具创建/更新面板
 5. **画布更新** —— 面板实时出现、重排、更新
@@ -169,9 +175,22 @@ cp -r channel-adapter/ <openclaw-plugins-dir>/pegboard
 
 ## 更多特性
 
-- **面板交互增强** —— 表格支持排序/筛选，列表支持勾选；拖拽面板到标签页可分类，拖到侧边栏可置顶/归档
+- **就地编辑** —— 双击文本面板直接编辑 Markdown；保存带冲突保护（编辑期间 Agent 改动了面板会弹出提示条，由你决定如何处理）
+- **可勾选条目** —— 列表和时间轴事件都带复选框；勾选状态存储在面板数据中，重启不丢失，并会回报给 Agent
+- **面板交互** —— 表格支持排序/筛选；拖拽面板到标签页可分类（也可在面板操作菜单中直接改分类），拖到侧边栏可置顶/归档
+- **更新时间** —— 面板标题栏显示相对更新时间（"X 分钟前更新"，悬停查看绝对时间）
 - **聊天多布局** —— 全屏、底栏、浮动窗口三种模式；文件上传支持图片/音频/文档（单文件 50MB 限制）
-- **Agent 主题控制** —— 新增 `theme_control` 工具，Agent 可查询/切换主题，也可通过 WebSocket 注册自定义主题 CSS
+- **Agent 主题控制** —— `theme_control` 工具让 Agent 可查询/切换主题，也可通过 WebSocket 注册自定义主题 CSS
+
+## v0.1.0 新内容
+
+首个标记版本。亮点：
+
+- **Claude Code 集成** —— 零依赖的 `claude-bridge/` 守护进程维持一个长驻 `claude` 进程，把回复流式送入聊天栏。在底部工具栏一键启停，或安装为 launchd 服务 24 小时在线。会话在 24 小时内可跨桥接器重启延续。
+- **可编辑面板** —— 双击文本面板编辑 Markdown，保存带冲突保护；勾选列表和时间轴条目，Agent 能看到变化。
+- **面板体验细节** —— 标题栏相对更新时间、操作菜单直接改分类、交互与实时数据配置跨应用重启持久化。
+- **可靠性** —— WS 服务器改为每客户端独立消息队列（慢客户端不再丢消息），流式分片按 `messageId` 路由并带不活动看门狗，每日快照不再与状态加载竞争。
+- **测试基础设施** —— Vitest + Testing Library，覆盖前端（jsdom）与桥接器（node）两套项目。
 
 ## License
 
