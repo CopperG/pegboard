@@ -55,5 +55,6 @@
   "view_day": "日",
   "view_week": "周",
   "view_month": "月",
-  "words_count": "{{count}} 字"
+  "words_count": "{{count}} 字",
+  "category": "分类"
 }

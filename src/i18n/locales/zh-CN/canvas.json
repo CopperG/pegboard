@@ -13,6 +13,7 @@
   "retry_connection": "重试连接",
   "added_to_category": "已添加到「{{category}}」",
   "already_in_category": "已在该分类中",
+  "removed_from_category": "已从「{{category}}」移除",
   "toggle_sidebar": "面板列表",
   "toggle_chat": "聊天"
 }

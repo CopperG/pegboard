@@ -25,4 +25,13 @@ describe('PanelShell', () => {
     expect(time).toBeInTheDocument()
     expect(time).toHaveAttribute('title')
   })
+
+  it('toggling category via store helper updates tags without bumping updatedAt', () => {
+    useCanvasStore.getState().createPanel(makePanelMessage({ tags: ['other'] }))
+    const before = useCanvasStore.getState().panels[0]!.updatedAt
+    useCanvasStore.getState().setTags('p1', ['work'])
+    const panel = useCanvasStore.getState().panels[0]!
+    expect(panel.tags).toEqual(['work'])
+    expect(panel.updatedAt).toBe(before)
+  })
 })

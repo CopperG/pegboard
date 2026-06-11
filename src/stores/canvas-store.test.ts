@@ -69,4 +69,14 @@ describe('canvas-store', () => {
       maxRetries: 3,
     })
   })
+
+  it('setTags does not bump updatedAt (category is metadata, not panel data)', async () => {
+    useCanvasStore.getState().createPanel(makePanelMessage())
+    const before = useCanvasStore.getState().panels[0]!.updatedAt
+    await new Promise((r) => setTimeout(r, 10))
+    useCanvasStore.getState().setTags('p1', ['work'])
+    const panel = useCanvasStore.getState().panels[0]!
+    expect(panel.tags).toEqual(['work'])
+    expect(panel.updatedAt).toBe(before)
+  })
 })

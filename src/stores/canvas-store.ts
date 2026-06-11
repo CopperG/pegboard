@@ -401,7 +401,6 @@ export const useCanvasStore = create<CanvasStore>()(
         const panel = state.panels.find((p) => p.panelId === panelId)
         if (panel) {
           panel.tags = normalizeTags(tags)
-          panel.updatedAt = new Date().toISOString()
         }
       })
     },
@@ -643,3 +642,6 @@ export const selectPanelInteraction = (panelId: string) => (s: ReturnType<typeof
 
 export const selectPanelUpdatedAt = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
   s.panels.find((p) => p.panelId === panelId)?.updatedAt
+
+export const selectPanelTags = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
+  s.panels.find((p) => p.panelId === panelId)?.tags
