@@ -64,9 +64,17 @@ impl WsState {
         self.clients.read().await.len()
     }
 
-    /// Deliver to every connected client. Clients with a full backlog are
-    /// dropped (their rx closes, ending their connection). Returns the
-    /// number of successful deliveries.
+    /// Deliver to every connected client. Returns the number of successful
+    /// deliveries.
+    ///
+    /// Backpressure contract (spans this method and `handle_connection`):
+    /// a client whose bounded queue is Full (too far behind) or already Closed
+    /// is removed from `clients` here, which drops its `mpsc::Sender`. That
+    /// causes the matching per-connection send loop (`rx.recv()` in
+    /// `handle_connection`) to observe channel close, break, and tear down the
+    /// socket. So "removed from the map here" is the single trigger that ends
+    /// the connection — no message is silently lost the way `broadcast::Lagged`
+    /// used to drop them.
     pub async fn send_to_all(&self, msg: &str) -> usize {
         let mut stale: Vec<u64> = Vec::new();
         let mut delivered = 0usize;

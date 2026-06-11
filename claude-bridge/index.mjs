@@ -17,7 +17,7 @@ import { spawn } from 'node:child_process'
 import { createInterface } from 'node:readline'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
-import { getWsToken } from '../skill/scripts/ws-helper.mjs'
+import { getWsToken, getWsUrl } from '../skill/scripts/ws-helper.mjs'
 import { buildPrompt } from './prompt.mjs'
 import { createSessionState, resetTurn, interpretEvent } from './stream-parser.mjs'
 import { createTurnQueue } from './queue.mjs'
@@ -113,24 +113,25 @@ function spawnClaude() {
 
   child.on('close', (code) => {
     log(`claude exited (code=${code}) ${stderr ? `stderr: ${stderr.slice(0, 300)}` : ''}`)
-    child = null
-    childRl = null
-    if (turn) {
-      turn.buffer.flushNow()
-      sendWs({ type: 'stream_chunk', messageId: turn.messageId, content: `\n[claude 进程异常退出 (code ${code})]` })
-      finishTurn()
-    }
+    failChild(`\n[claude 进程异常退出 (code ${code})]`)
   })
 
   child.on('error', (err) => {
     log(`failed to start claude: ${err}`)
-    child = null
-    childRl = null
-    if (turn) {
-      sendWs({ type: 'stream_chunk', messageId: turn.messageId, content: `无法启动 Claude Code: ${String(err)}` })
-      finishTurn()
-    }
+    failChild(`无法启动 Claude Code: ${String(err)}`)
   })
+}
+
+// Child process died (crash/exit or failed to start): drop it (next turn lazily
+// respawns) and surface the reason to the in-flight turn. finishTurn() flushes
+// the buffer + sends stream_end, so no separate flush is needed here.
+function failChild(reason) {
+  child = null
+  childRl = null
+  if (turn) {
+    sendWs({ type: 'stream_chunk', messageId: turn.messageId, content: reason })
+    finishTurn()
+  }
 }
 
 function finishTurn() {
@@ -196,7 +197,7 @@ async function connectLoop() {
   let attempt = 0
   for (;;) {
     const token = await getWsToken()
-    const url = token ? `ws://localhost:9800?token=${token}` : 'ws://localhost:9800'
+    const url = getWsUrl(token)
     log(`connecting (attempt ${attempt + 1})`)
 
     await new Promise((resolve) => {

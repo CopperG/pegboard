@@ -256,19 +256,19 @@ export function useWebSocket() {
 
   // ── Stream Handlers ─────────────────────────────────────────────────
 
-  function kickWatchdog() {
-    if (watchdogRef.current) clearTimeout(watchdogRef.current)
-    watchdogRef.current = setTimeout(() => {
-      watchdogRef.current = null
-      setStreaming(false)
-    }, STREAM_INACTIVITY_MS)
-  }
-
   function clearWatchdog() {
     if (watchdogRef.current) {
       clearTimeout(watchdogRef.current)
       watchdogRef.current = null
     }
+  }
+
+  function kickWatchdog() {
+    clearWatchdog()
+    watchdogRef.current = setTimeout(() => {
+      watchdogRef.current = null
+      setStreaming(false)
+    }, STREAM_INACTIVITY_MS)
   }
 
   function handleStreamStart(msg: StreamStart) {
