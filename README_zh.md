@@ -98,6 +98,13 @@ pnpm tauri dev
 cp -r skill/ <openclaw-skills-dir>/pegboard
 ```
 
+> **Agent 兼容性现状**
+>
+> - **Skill（面板控制）**：通用 —— 任何能执行 skill 脚本的 Agent 都可以控制面板（Claude Code、OpenClaw 等）。
+> - **聊天对话**：当前重点支持 **Claude Code**（经 claude-bridge，见下文）。
+> - **OpenClaw channel 模式**：仅适配**旧版 OpenClaw** 的 channel 协议，新版 OpenClaw 尚未适配。
+> - 其他 Agent 的对话接入待后续开发。
+
 ### 配合 Claude Code 使用
 
 Pegboard 开箱即支持 [Claude Code](https://claude.com/claude-code)。
@@ -140,7 +147,9 @@ node claude-bridge/index.mjs
 
 如果只在交互式 Claude Code 会话中控制面板（不用聊天栏），只装 skill 即可。
 
-### 安装 OpenClaw Channel 插件（可选，仅 OpenClaw —— 勿与 claude-bridge 同时运行）
+### 安装 OpenClaw Channel 插件（可选，仅适配旧版 OpenClaw —— 勿与 claude-bridge 同时运行）
+
+**注意：当前 channel 插件只兼容旧版 OpenClaw 的 channel 模式，新版 OpenClaw 尚未适配。** 聊天对话推荐使用上文的 Claude Code 桥接器。
 
 `channel-adapter/` 目录包含一个 OpenClaw channel 插件，用于桥接 Agent 和洞洞板之间的 WebSocket 连接。如果你的部署需要专用 channel，可以安装它：
 

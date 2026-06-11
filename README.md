@@ -98,6 +98,13 @@ Copy the `skill/` directory to your OpenClaw skills folder so the agent can cont
 cp -r skill/ <openclaw-skills-dir>/pegboard
 ```
 
+> **Agent compatibility status**
+>
+> - **Skill (panel control)**: universal — any agent that can run the skill scripts can control panels (Claude Code, OpenClaw, ...).
+> - **Chat conversations**: currently focused on **Claude Code** (via claude-bridge, see below).
+> - **OpenClaw channel mode**: only compatible with the **legacy OpenClaw** channel protocol; the new OpenClaw version is not supported yet.
+> - Chat integration for other agents is planned but not yet developed.
+
 ### Use with Claude Code
 
 Pegboard works with [Claude Code](https://claude.com/claude-code) out of the box.
@@ -141,7 +148,9 @@ Configuration (env vars):
 If you only need panel control from an interactive Claude Code session
 (no chat bar), installing the skill alone is enough.
 
-### Install the OpenClaw Channel Plugin (optional, OpenClaw only — do not combine with claude-bridge)
+### Install the OpenClaw Channel Plugin (optional, legacy OpenClaw only — do not combine with claude-bridge)
+
+**Note: the channel plugin currently only works with the legacy OpenClaw channel mode; the new OpenClaw version is not supported yet.** For chat conversations, the Claude Code bridge above is the recommended path.
 
 The `channel-adapter/` directory contains an OpenClaw channel plugin that bridges the WebSocket connection between the agent and Pegboard. Install it if your setup requires a dedicated channel:
 
