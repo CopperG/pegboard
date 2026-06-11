@@ -640,3 +640,6 @@ export const selectPanelStarred = (panelId: string) => (s: ReturnType<typeof use
 
 export const selectPanelInteraction = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
   s.panels.find((p) => p.panelId === panelId)?.interaction
+
+export const selectPanelUpdatedAt = (panelId: string) => (s: ReturnType<typeof useCanvasStore.getState>) =>
+  s.panels.find((p) => p.panelId === panelId)?.updatedAt

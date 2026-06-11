@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PanelSize } from '@/types/layout'
-import { useCanvasStore, selectPanelStarred } from '@/stores/canvas-store'
+import { useCanvasStore, selectPanelStarred, selectPanelUpdatedAt } from '@/stores/canvas-store'
+import { useRelativeTime } from '@/hooks/useRelativeTime'
 import { getPanelIcon } from '@/lib/panel-icons'
 import {
   Popover,
@@ -110,6 +111,8 @@ export function PanelShell({
 }: PanelShellProps) {
   const [expanded, setExpanded] = useState(false)
   const starred = useCanvasStore(selectPanelStarred(panelId))
+  const updatedAt = useCanvasStore(selectPanelUpdatedAt(panelId))
+  const { relative: updatedRelative, absolute: updatedAbsolute } = useRelativeTime(updatedAt)
 
   const shellRef = useRef<HTMLDivElement>(null)
   const panelIcon = panelType ? getPanelIcon(panelType) : null
@@ -198,6 +201,14 @@ export function PanelShell({
               <Star className="w-3.5 h-3.5 text-panel-star fill-panel-star ml-1 shrink-0 drop-shadow-sm" />
             )}
             <span className="flex-1" />
+            {updatedRelative && (
+              <span
+                className="text-[10px] text-panel-overlay-text/70 mx-1.5 shrink-0 tabular-nums drop-shadow-sm"
+                title={updatedAbsolute}
+              >
+                {updatedRelative}
+              </span>
+            )}
             <PanelActionsMenu
               pinned={pinned}
               starred={starred}
@@ -247,6 +258,14 @@ export function PanelShell({
               </span>
             )}
             <span className="flex-1" />
+            {updatedRelative && (
+              <span
+                className="text-[10px] text-muted-foreground/70 mx-1.5 shrink-0 tabular-nums"
+                title={updatedAbsolute}
+              >
+                {updatedRelative}
+              </span>
+            )}
             <PanelActionsMenu
               pinned={pinned}
               starred={starred}
