@@ -258,7 +258,7 @@ export function PanelShell({
           </div>
 
           {/* Content area — hide HTML panel children when expanded to avoid dual SandboxRenderer */}
-          <div className={`flex-1 px-3 pb-3 overflow-hidden ${isHtmlPanel ? 'min-h-0' : 'overflow-auto'}`}>
+          <div className={`flex-1 px-3 pb-3 ${isHtmlPanel ? 'overflow-hidden min-h-0' : 'overflow-auto'}`}>
             {!(expanded && isHtmlPanel) && children}
           </div>
         </>
