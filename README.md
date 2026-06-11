@@ -1,6 +1,6 @@
 <div align="center">
 
-# OpenClaw Pegboard
+# Pegboard
 
 **A universal canvas for AI agents to mount anything — like a pegboard on your wall.**
 

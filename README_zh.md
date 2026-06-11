@@ -1,6 +1,6 @@
 <div align="center">
 
-# OpenClaw 洞洞板 Pegboard
+# 洞洞板 Pegboard
 
 **AI 的万能洞洞板 —— 让 Agent 自主生成任何面板化内容到你的桌面画布。**
 
