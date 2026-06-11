@@ -10,7 +10,23 @@ export default defineConfig({
     },
   },
   test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'frontend',
+          include: ['src/**/*.test.{ts,tsx}'],
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+        },
+      },
+      {
+        test: {
+          name: 'claude-bridge',
+          include: ['claude-bridge/**/*.test.mjs'],
+          environment: 'node',
+        },
+      },
+    ],
   },
 })
